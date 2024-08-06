@@ -6,66 +6,107 @@
       <span class="category">{{ post.category }}</span>
       <span class="rating">Rating: {{ post.rating }}/5</span>
     </div>
-    <div v-if="content">
-      <VueMarkdown :source="content" />
-    </div>
-    <div v-else-if="error">Error: {{ error }}</div>
-    <div v-else> Loading</div>
+    <div v-html="renderedContent"></div>
+
+    <!-- 除錯使用 -->
+    <!-- <div v-if="debugInfo">debugInfo: {{ debugInfo }}</div>
+    <div v-else-if = "error">Error:{{ error }}</div>
+    <div v-else>Loading</div>
+    -->
+
+    <!-- <pre v-if="debugInfo"> debugInfo = {{ debugInfo }}</pre>
+    <pre v-if="content"> Content: {{content.substring(0,100)}}</pre> -->
   </article>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import  VueMarkdown  from 'vue-markdown-render'
-// import articleList from '../data/articleList.json';
+import { ref, computed, onMounted } from "vue";
+import MarkdownIt from "markdown-it";
+import matter from "gray-matter";
+import articleList from "@/data/articleList.json";
+
+// 添加这个 polyfill
+if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
+  window.Buffer = {
+    from: function(str) {
+      return str;
+    }
+  };
+}
+
+//vite的import.meta.glob動態導入所有md
+const articleModules = import.meta.glob("/src/assets/article/**/*.md", {
+  as: "raw",
+});
 
 export default {
-  name: 'BlogPost',
-  components: {
-    VueMarkdown
-  },
+  name: "BlogPost",
   props: {
     postId: {
       type: String,
-      required: true
-    }
-
+      required: true,
+    },
   },
   setup(props) {
-    // vue3 的組合API
-    const post = ref(null)
-    //新增響應式引用
-    const content = ref('')
-    const error = ref(null)
-    
-    //組件掛載時執行
+    // console.log("組件"+ articleModules)
+
+    //創建markdown實例
+    const md = new MarkdownIt();
+    const post = ref(null);
+    const content = ref("");
+    const error = ref(null);
+    const debugInfo = ref("");
+
+    //計算屬性將markdown內容渲染為html
+    const renderedContent = computed(() => md.render(content.value));
+
     onMounted(async () => {
       try {
-        //動態導入文章列表
-        const articleList = await import('../data/articleList.json')
-        //根據ID找到對應文章
-        post.value = articleList.default.find(article => article.id === props.postId)
+        const articleInfo = articleList.find(
+          (article) => article.id === props.postId
+        );
 
+        if (articleInfo) {
+          const modulePath = `/src/assets/article/${articleInfo.path}`;
+          debugInfo.value = `尝试加载文件: ${modulePath}\n`;
 
-        if (post.value) {
-          const module = await import(`../assets/article/${post.value.path}`)
-          content.value = module.default
-        }else{
-          error.value = "沒找到文章"
+          // console.log("可用文章模块:", Object.keys(articleModules));
+
+          if (modulePath in articleModules) {
+            const rawContent = await articleModules[modulePath]();
+            const { data, content: markdownContent } = matter(rawContent);
+
+            post.value = { ...data, id: props.postId };
+            content.value = markdownContent;
+
+            debugInfo.value += `文件加载成功\n`;
+            debugInfo.value += `元數據: ${JSON.stringify(data)}\n`;
+            debugInfo.value += `内容长度: ${content.value.length}\n`;
+          } else {
+            error.value = "Article file not found";
+            debugInfo.value += `文件未找到: ${modulePath}\n`;
+            // debugInfo.value += `可用路径: ${Object.keys(articleModules).join(', ')}\n`;
+          }
+        } else {
+          error.value = "Article not found";
+          debugInfo.value = "文章在 articleList 中未找到\n";
         }
       } catch (e) {
-        console.error('Error loading article:', e)
-        error.value = e.message
+        console.error("Error loading article:", e);
+        error.value = e.message;
+        debugInfo.value += `错误: ${e.message}\n`;
       }
-    })
+    });
 
     return {
       post,
-      content,
-      error
-    }
-  }
-}
+      renderedContent,
+      error,
+      debugInfo,
+      // markdownContent
+    };
+  },
+};
 </script>
 
 <style scoped>

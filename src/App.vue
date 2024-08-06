@@ -1,10 +1,20 @@
 <template>
-  <nav>
-    <!-- <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> -->
-  </nav>
-  <router-view/>
+  <ErrorBoundary>  </ErrorBoundary>
+  <!-- <div>what's wrong</div> -->
+    <!-- <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </nav> -->
+    <router-view />
 </template>
+
+<script>
+import ErrorBoundary from './components/ErrorBoundary.vue'
+export default {
+  components: { ErrorBoundary }
+
+}
+</script>
 
 <style>
 #app {
