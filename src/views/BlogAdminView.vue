@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import articleList from '../data/articleList.json'
+import articleList from '../data/articleList.js'
 
 export default {
   name: 'BlogAdminView',

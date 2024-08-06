@@ -35,7 +35,7 @@ export default {
     const articleList = ref([]);
     const loadArticles = async()=>{
       try{
-        const respose = await import('../data/articleList.json');
+        const respose = await import('../data/articleList.js');
         articleList.value = respose.default;
       }catch(error){
         console.error('Error loading article list:', error);

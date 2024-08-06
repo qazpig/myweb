@@ -42,7 +42,7 @@ export default {
     onMounted(async () => {
       try {
         //動態導入文章列表
-        const articleList = await import('../data/articleList.json')
+        const articleList = await import('../data/articleList.js')
         //根據ID找到對應文章
         post.value = articleList.default.find(article => article.id === props.postId)
 

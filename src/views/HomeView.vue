@@ -33,7 +33,7 @@
 
 <script>
 import WebHeader from "../components/WebHeader.vue";
-import articleList from "../data/articleList.json";
+import articleList from "../data/articleList.js";
 
 export default {
   components: {
