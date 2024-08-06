@@ -1,22 +1,18 @@
 <template>
-  <div>
-    <WebHeader/>
-    
+  <div class="blog-view">
+    <WebHeader />
     <div class="container">
-      <main>
-        <article class="post">
-          <h2>{{ post.title }}</h2>
-          <div class="post-meta">
-            <span class="rating">
-              <i v-for="n in 5" :key="n" :class="starClass(n)"></i>
-            </span>
-            <span class="date">{{ post.date }}</span>
-          </div>
-          <p v-for="(paragraph, index) in post.content" :key="index">{{ paragraph }}</p>
-        </article>
-      </main>
+      <BlogPost :postId="$route.params.id"></BlogPost>
+
       <aside class="sidebar">
-        <h3>Future Development Space</h3>
+        <h3>最近文章</h3>
+        <ul>
+          <li v-for="post in recentPosts" :key="post.id">
+            <router-link :to="'/blog/' + post.id">
+              {{ post.title }}</router-link
+            >
+          </li>
+        </ul>
         <p>This area is reserved for future features and content.</p>
       </aside>
     </div>
@@ -24,37 +20,84 @@
 </template>
 
 <script>
-import  WebHeader  from "@/components/WebHeader.vue";
+import { ref, computed, onMounted } from "vue";
+import WebHeader from "../components/WebHeader.vue";
+import BlogPost from "../components/BlogPost.vue";
+
 export default {
-  components:{
-    WebHeader
+  name: "BlogView", //取名這個Vue的名稱
+  components: {
+    //本頁所使用的模板
+    WebHeader,
+    BlogPost,
   },
-  name: 'BlogView',
-  data() {
-    return {
-      post: {
-        title: 'Inception: A Mind-Bending Experience',
-        rating: 4.5,
-        date: '2023-05-15',
-        content: [
-          'Inception is a masterpiece of modern cinema that challenges the viewer\'s perception of reality. Christopher Nolan\'s direction combined with a stellar cast led by Leonardo DiCaprio creates a thrilling and thought-provoking experience. The film\'s intricate plot, stunning visuals, and haunting soundtrack come together to form a truly unforgettable cinematic journey.',
-          'As the characters delve deeper into layers of dreams, the audience is taken on a mind-bending adventure that questions the nature of reality and the power of ideas. The film\'s exploration of the subconscious mind and the concept of shared dreaming opens up fascinating philosophical questions about the nature of reality and the human mind.',
-          'While the complex narrative may require multiple viewings to fully grasp, the film\'s emotional core – Cobb\'s struggle to return to his children – grounds the story and provides a human element amidst the high-concept sci-fi elements. This balance of intellectual stimulation and emotional resonance is what sets Inception apart as a true masterpiece of contemporary cinema.'
-        ]
+  setup(){
+    const articleList = ref([]);
+    const loadArticles = async()=>{
+      try{
+        const respose = await import('../data/articleList.json');
+        articleList.value = respose.default;
+      }catch(error){
+        console.error('Error loading article list:', error);
       }
     }
-  },
-  methods: {
-    starClass(n) {
-      const rating = Math.floor(this.post.rating);
-      return {
-        'fas fa-star': n <= rating,
-        'fas fa-star-half-alt': n > rating && n - 0.5 <= this.post.rating,
-        'far fa-star': n > Math.ceil(this.post.rating)
-      }
+
+    const recentPosts =computed(()=>{
+      return articleList.value.slice(0,5);
+    })
+
+    onMounted(()=>{
+      loadArticles();
+    })
+
+    return{
+      recentPosts
     }
   }
-}
+
+  // data() {
+  //   return {
+  //     currentPost: null,
+  //   };
+  // },
+  // computed: {
+  //   recentPosts() {
+  //     return this.BlogPost.slice(0, 5);
+  //   },
+  // },
+
+  // methods: {
+  //   starClass(rating, n) {
+  //     const fullStars = Math.floor(rating);
+  //     return {
+  //       "fas fa-star": n <= fullStars,
+  //       "fas fa-star-half-alt": n > fullStars && n - 0.5 <= rating,
+  //       "far fa-star": n > Math.ceil(rating),
+  //     };
+  //   },
+
+  //   loadPost(id) {
+  //     this.currentPost = this.BlogPost.find((post) => post.id === parseInt(id));
+  //   },
+  // },
+
+  // created() {
+  //   const postId = this.$route.params.id;
+  //   if (postId) {
+  //     this.loadPost(postId);
+  //   } else {
+  //     this.currentPost = this.BlogPost[0];
+  //   }
+  // },
+
+  // watch: {
+  //   $route(to) {
+  //     if (to.params.id) {
+  //       this.loadPost(to.params.id);
+  //     }
+  //   },
+  // },
+};
 </script>
 
 <style scoped>
@@ -94,7 +137,7 @@ main {
   background-color: white;
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 h2 {
   color: #2c3e50;

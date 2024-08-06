@@ -17,8 +17,10 @@
             </span>
             <span class="date">{{ post.date }}</span>
           </div>
-          <p>{{ post.excerpt }}</p>
-          <router-link :to="'/blog/' + post.id" class="read-more">Read more</router-link>
+          <div v-html="truncateHTMl(post.content, 200)"></div>
+          <router-link :to="'/blog/' + post.id" class="read-more"
+            >Read more</router-link
+          >
         </div>
       </main>
       <aside class="right-sidebar">
@@ -30,50 +32,43 @@
 </template>
 
 <script>
-import  WebHeader  from "@/components/WebHeader.vue";
+import WebHeader from "../components/WebHeader.vue";
+import articleList from "../data/articleList.json";
+
 export default {
-  components:{
-    WebHeader
+  components: {
+    WebHeader,
   },
-  name: 'HomeView',
+  name: "HomeView",
   data() {
     return {
-      latestPosts: [
-        {
-          id: 1,
-          title: 'Inception: A Mind-Bending Experience',
-          rating: 4.5,
-          date: '2023-05-15',
-          excerpt: 'Inception is a masterpiece of modern cinema that challenges the viewer\'s perception of reality...'
-        },
-        {
-          id: 2,
-          title: 'Spirited Away: Miyazaki\'s Animated Wonder',
-          rating: 5,
-          date: '2023-05-10',
-          excerpt: 'Hayao Miyazaki\'s Spirited Away is a breathtaking journey into a world of magic and wonder...'
-        },
-        {
-          id: 3,
-          title: 'Catan: The Classic Strategy Game',
-          rating: 4,
-          date: '2023-05-05',
-          excerpt: 'Catan remains a staple of board game nights for good reason. Its blend of strategy, luck, and player interaction...'
-        }
-      ]
-    }
+      latestPosts: articleList.slice(0, 3),
+    };
   },
   methods: {
     starClass(rating, n) {
       const fullStars = Math.floor(rating);
       return {
-        'fas fa-star': n <= fullStars,
-        'fas fa-star-half-alt': n > fullStars && n - 0.5 <= rating,
-        'far fa-star': n > Math.ceil(rating)
+        "fas fa-star": n <= fullStars,
+        "fas fa-star-half-alt": n > fullStars && n - 0.5 <= rating,
+        "far fa-star": n > Math.ceil(rating),
+      };
+    },
+    truncateHTMl(html, maxlength) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      const text = div.textContent || div.innerHTML || "";
+      if (text.length <= maxlength) {
+        return html;
       }
-    }
-  }
-}
+      let truncated = text.substring(0, maxlength);
+      if (truncated.lastIndexOf(" ") > 0) {
+        truncated = truncated.substring(0, truncated.lastIndexOf(" "));
+      }
+      return truncated + "...";
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -114,7 +109,8 @@ main {
   padding: 0 20px;
 }
 
-.left-sidebar, .right-sidebar {
+.left-sidebar,
+.right-sidebar {
   flex: 0 0 25%;
   background-color: #f0f0f0;
   padding: 20px;
@@ -125,10 +121,11 @@ main {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h2, h3 {
+h2,
+h3 {
   color: #2c3e50;
 }
 
