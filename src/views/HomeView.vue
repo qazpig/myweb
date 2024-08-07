@@ -3,13 +3,22 @@
     <WebHeader></WebHeader>
 
     <div class="container">
+      <!-- 左側區塊 -->
       <aside class="left-sidebar">
         <h2>Left Sidebar</h2>
         <p>Future content area</p>
       </aside>
+      <!-- 主區塊 -->
       <main>
         <h2>Latest Reviews</h2>
-        <div v-for="post in latestPosts" :key="post.id" class="post-preview">
+        <div v-if="loading">載入中...</div>
+        <div v-else-if="error">錯誤:{{ error }}</div>
+        <div
+          v-else
+          v-for="post in latestArticles"
+          :key="post.id"
+          class="post-preview"
+        >
           <h3>{{ post.title }}</h3>
           <div class="post-meta">
             <span class="rating">
@@ -23,6 +32,7 @@
           >
         </div>
       </main>
+      <!-- 右邊區塊 -->
       <aside class="right-sidebar">
         <h2>Right Sidebar</h2>
         <p>Future content area</p>
@@ -31,45 +41,47 @@
   </div>
 </template>
 
-<script>
-import WebHeader from "../components/WebHeader.vue";
-import articleList from "../data/articleList.json";
 
-export default {
-  components: {
-    WebHeader,
-  },
-  name: "HomeView",
-  data() {
-    return {
-      latestPosts: articleList.slice(0, 3),
-    };
-  },
-  methods: {
-    starClass(rating, n) {
-      const fullStars = Math.floor(rating);
-      return {
-        "fas fa-star": n <= fullStars,
-        "fas fa-star-half-alt": n > fullStars && n - 0.5 <= rating,
-        "far fa-star": n > Math.ceil(rating),
-      };
-    },
-    truncateHTMl(html, maxlength) {
-      const div = document.createElement("div");
-      div.innerHTML = html;
-      const text = div.textContent || div.innerHTML || "";
-      if (text.length <= maxlength) {
-        return html;
-      }
-      let truncated = text.substring(0, maxlength);
-      if (truncated.lastIndexOf(" ") > 0) {
-        truncated = truncated.substring(0, truncated.lastIndexOf(" "));
-      }
-      return truncated + "...";
-    },
-  },
+<script setup>
+import { onMounted } from "vue";
+import WebHeader from "../components/WebHeader.vue";
+import { useArticle } from "../methods/useArticles";
+
+//使用 esuArticles 的組合式函數
+const { latestArticles, loading, error, loadArticles } = useArticle();
+
+//組件掛載時加載文章
+onMounted(() => {
+  loadArticles(3); //加載3篇文章
+});
+
+//評分星星
+const starClass = (rating, n) => {
+  const fullStars = Math.floor(rating);
+  return {
+    "fas fa-star": n <= fullStars,
+    "fas fa-star-half-alt": n > fullStars && n - 0.5 <= rating,
+    "far fa-star": n > Math.ceil(rating),
+  };
 };
+
+//HTML內容截斷函數
+const truncateHTMl = (html, maxlength) => {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  const text = div.textContent || div.innerHTML || "";
+  if (text.length <= maxlength) {
+    return html;
+  }
+  let truncated = text.substring(0, maxlength);
+  if (truncated.lastIndexOf(" ") > 0) {
+    truncated = truncated.substring(0, truncated.lastIndexOf(" "));
+  }
+  return truncated + "...";
+};
+
 </script>
+
 
 <style scoped>
 .home {

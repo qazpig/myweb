@@ -1,5 +1,5 @@
 <template>
-  <ErrorBoundary>  </ErrorBoundary>
+  <!-- <ErrorBoundary></ErrorBoundary> -->
   <!-- <div>what's wrong</div> -->
     <!-- <nav>
       <router-link to="/">Home</router-link> |
@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import ErrorBoundary from './components/ErrorBoundary.vue'
+// import ErrorBoundary from './components/ErrorBoundary.vue'
 export default {
-  components: { ErrorBoundary }
+  // components: { ErrorBoundary }
 
 }
 </script>

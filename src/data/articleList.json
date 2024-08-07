@@ -5,16 +5,19 @@
 	},
 	{
 		"id": "inception2",
-		
 		"path": "movie/testing.md"
 	},
 	{
 		"id": "inception3",
-		
 		"path": "movie/inception.md"
 	},
 	{
 		"id": "inception4",
 		"path": "movie/inception.md"
+	},
+	{
+		"id": "boardgame1",
+		"path": "boardgame/boardtesting.md"
 	}
+
 ]
