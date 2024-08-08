@@ -1,5 +1,7 @@
 ---
-title: 測試標題噗噗
+title: "測試標題噗噗"
+date: "2023-05-15"
+category: "Movies"
 rating: 5
 ---
 

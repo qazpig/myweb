@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
 import BlogAdminView from '../views/BlogAdminView.vue'
 import BoardGamesView from '@/views/BoardGamesView.vue'
+import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
 
 const routes = [
   {
@@ -54,6 +55,11 @@ const routes = [
     name: 'escapegames',
     component: BlogView
     // component: () => import('../views/EscapeGamesView.vue')
+  },
+  {
+    path: '/manage',
+    name: 'manage',
+    component: TagAndFrontMatterManager
   }
 ]
 

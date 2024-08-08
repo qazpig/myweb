@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "gray-matter": "^4.0.3",
     "markdown-it": "^14.1.0",
+    "pinia": "^2.2.1",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },

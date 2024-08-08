@@ -5,18 +5,28 @@
     </header>
     <div class="container">
       <main class="main-content">
-        <div v-for="game in filteredGames" :key="game.id" class="game-card">
-          <img :src="game.image" :alt="game.title" />
-          <div class="game-info">
-            <div class="game-title">{{ game.title }}</div>
-            <div class="game-meta">
-              玩家人數: {{ game.players }} | 遊戲時長: {{ game.duration }} |
-              難度: {{ game.difficulty }}
+        <div v-if="articleStore.loading">載入中...</div>
+        <div v-else-if="articleStore.error">
+          錯誤訊息：{{ articleStore.error }}
+        </div>
+        <div v-else>
+          <div
+            v-for="game in articleStore.articles"
+            :key="game.id"
+            class="game-card"
+          >
+            <img :src="game.image" :alt="game.title" />
+            <div class="game-info">
+              <div class="game-title">{{ game.title }}</div>
+              <div class="game-meta">
+                玩家人數: {{ game.players }} | 遊戲時長: {{ game.duration }} |
+                難度: {{ game.difficulty }}
+              </div>
+              <p>{{ game.description }}</p>
+              <router-link :to="`/blog/${game.id}`" class="read-more"
+                >閱讀更多</router-link
+              >
             </div>
-            <p>{{ game.description }}</p>
-            <router-link :to="`/blog/${game.id}`" class="read-more"
-              >閱讀更多</router-link
-            >
           </div>
         </div>
       </main>
@@ -59,17 +69,34 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useArticle } from "../methods/useArticles";
+import { ref, onMounted ,watch } from "vue";
+import { useArticleStore } from "@/stores/articleStore";
 
-const { articles, loadArticles } = useArticle();
-
-// 載入文章（這裡假設所有桌遊相關的文章）
-loadArticles();
-
+const articleStore = useArticleStore();
 // 遊戲類型和難度等級
 const gameTypes = ["策略", "家庭", "派對", "合作"];
 const difficultyLevels = ["入門", "中等", "專家"];
+
+//
+onMounted(async () => {
+  console.log("Component mounted, fetching articles...");
+  await articleStore.fetchArticles();
+  console.log("Articles after fetch:", articleStore.articles);
+});
+
+watch(() => articleStore.articles, (newArticles) => {
+  console.log('Articles updated in view:', newArticles);
+}, { immediate: true });
+
+watch(() => articleStore.loading, (isLoading) => {
+  console.log('Loading status:', isLoading);
+}, { immediate: true });
+
+watch(() => articleStore.error, (error) => {
+  if (error) {
+    console.error('Error in article store:', error);
+  }
+}, { immediate: true });
 
 // 活動過濾器
 const activeFilters = ref({
@@ -88,17 +115,17 @@ const toggleFilter = (category, value) => {
 };
 
 // 過濾遊戲
-const filteredGames = computed(() => {
-  return articles.value.filter((game) => {
-    const typeMatch =
-      activeFilters.value.type.length === 0 ||
-      activeFilters.value.type.includes(game.type);
-    const difficultyMatch =
-      activeFilters.value.difficulty.length === 0 ||
-      activeFilters.value.difficulty.includes(game.difficulty);
-    return typeMatch && difficultyMatch;
-  });
-});
+// const filteredGames = computed(() => {
+//   return articles.value.filter((game) => {
+//     const typeMatch =
+//       activeFilters.value.type.length === 0 ||
+//       activeFilters.value.type.includes(game.type);
+//     const difficultyMatch =
+//       activeFilters.value.difficulty.length === 0 ||
+//       activeFilters.value.difficulty.includes(game.difficulty);
+//     return typeMatch && difficultyMatch;
+//   });
+// });
 </script>
 
 <style scoped>
