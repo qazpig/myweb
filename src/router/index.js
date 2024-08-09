@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
-import BlogAdminView from '../views/BlogAdminView.vue'
+// import BlogAdminView from '../views/BlogAdminView.vue'
 import BoardGamesView from '@/views/BoardGamesView.vue'
 import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
+import NewArticleView from '@/views/NewArticleView.vue'
 
 const routes = [
   {
@@ -27,11 +28,10 @@ const routes = [
     component: BlogView
   },
   {
-    path: '/admin',
-    name: 'BlogAdmin',
-    component: BlogAdminView
+    path: '/new-article',
+    name: 'NewArticle',
+    component: NewArticleView
   },
-
   {
     path: '/movies',
     name: 'movies',

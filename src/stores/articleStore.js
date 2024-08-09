@@ -70,14 +70,16 @@ export const useArticleStore = defineStore('article', {
         this.articles = [];
       } finally {
         this.loading = false;
-        console.log('Final articles state:', this.articles);    
+        console.log('Final articles state:', this.articles);
       }
     },
 
     //可以透過ID加載單篇文章
     async fetchArticleById(id) {
-      if (this.getArticleById(id)) return;
-
+      if (this.getArticleById(id)) {
+        console.log("用什麼ID拿",id)
+        return;
+      }
       this.loading = true
       this.error = null
       try {

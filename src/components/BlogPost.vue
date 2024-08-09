@@ -1,6 +1,7 @@
 <template>
   <article class="blog-post" v-if="post">
     <h1>{{ post.title }}</h1>
+    <p>{{ postId }}</p>
     <div class="post-meta">
       <span class="date">{{ post.date }}</span>
       <span class="category">{{ post.category }}</span>
@@ -19,94 +20,38 @@
   </article>
 </template>
 
-<script>
-import { ref, computed, onMounted } from "vue";
-import MarkdownIt from "markdown-it";
-import matter from "gray-matter";
-import articleList from "@/data/articleList.json";
+<script setup>
+import { onMounted,defineProps, toRef } from "vue";
+import { useArticleStore } from "@/stores/articleStore";
 
-// 添加这个 polyfill
-if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
-  window.Buffer = {
-    from: function(str) {
-      return str;
-    }
-  };
-}
+// // 添加这个 polyfill
+// if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
+//   window.Buffer = {
+//     from: function(str) {
+//       return str;
+//     }
+//   };
+// }
 
-//vite的import.meta.glob動態導入所有md
-const articleModules = import.meta.glob("/src/assets/article/**/*.md", {
-  as: "raw",
+const props = defineProps({
+  postId: String,
 });
+const postId = toRef(props,'postId')
 
-export default {
-  name: "BlogPost",
-  props: {
-    postId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    // console.log("組件"+ articleModules)
+const articleStore = useArticleStore();
 
-    //創建markdown實例
-    const md = new MarkdownIt();
-    const post = ref(null);
-    const content = ref("");
-    const error = ref(null);
-    const debugInfo = ref("");
+console.log(postId)
+console.log(postId.value)
 
-    //計算屬性將markdown內容渲染為html
-    const renderedContent = computed(() => md.render(content.value));
+const post = articleStore.fetchArticleById(postId.value);
+console.log(post)
 
-    onMounted(async () => {
-      try {
-        const articleInfo = articleList.find(
-          (article) => article.id === props.postId
-        );
 
-        if (articleInfo) {
-          const modulePath = `/src/assets/article/${articleInfo.path}`;
-          debugInfo.value = `尝试加载文件: ${modulePath}\n`;
-
-          // console.log("可用文章模块:", Object.keys(articleModules));
-
-          if (modulePath in articleModules) {
-            const rawContent = await articleModules[modulePath]();
-            const { data, content: markdownContent } = matter(rawContent);
-
-            post.value = { ...data, id: props.postId };
-            content.value = markdownContent;
-
-            debugInfo.value += `文件加载成功\n`;
-            debugInfo.value += `元數據: ${JSON.stringify(data)}\n`;
-            debugInfo.value += `内容长度: ${content.value.length}\n`;
-          } else {
-            error.value = "Article file not found";
-            debugInfo.value += `文件未找到: ${modulePath}\n`;
-            // debugInfo.value += `可用路径: ${Object.keys(articleModules).join(', ')}\n`;
-          }
-        } else {
-          error.value = "Article not found";
-          debugInfo.value = "文章在 articleList 中未找到\n";
-        }
-      } catch (e) {
-        console.error("Error loading article:", e);
-        error.value = e.message;
-        debugInfo.value += `错误: ${e.message}\n`;
-      }
-    });
-
-    return {
-      post,
-      renderedContent,
-      error,
-      debugInfo,
-      // markdownContent
-    };
-  },
-};
+onMounted(async() => {
+  // articleStore.fetchArticleById(postId);
+  await articleStore.fetchArticleById(postId.value);
+  console.log(post)
+});
 </script>
 
 <style scoped>
