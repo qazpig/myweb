@@ -54,6 +54,7 @@ import MarkdownIt from "markdown-it";
 // // 添加这个 polyfill
 // if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
 //   window.Buffer = {
+
 //     from: function(str) {
 //       return str;
 //     }
