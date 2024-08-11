@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
 import BlogAdminView from '../views/BlogAdminView.vue'
 import BoardGamesView from '@/views/BoardGamesView.vue'
+import NewArticle from '@/views/NewArticle.vue'
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
     path: '/about',
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  {
+    path: '/newArticle',
+    name:'NewArticle',
+    component: NewArticle
   },
   {
     path: '/blog',
@@ -30,7 +36,6 @@ const routes = [
     name: 'BlogAdmin',
     component: BlogAdminView
   },
-
   {
     path: '/movies',
     name: 'movies',
