@@ -2,11 +2,39 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
 // import BlogAdminView from '../views/BlogAdminView.vue'
-import BoardGamesView from '@/views/BoardGamesView.vue'
 import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
 import NewArticleView from '@/views/NewArticleView.vue'
+import ArticleArea from '@/components/ArticleArea.vue'
+import { articleCategories } from '@/data/articleCategories.js'
+import BoardGamesView from '@/views/BoardGamesView.vue'
+
+console.log(articleCategories);
+
+const views = {
+  BoardGamesView
+};
 
 const routes = [
+  ...articleCategories.map(category =>({
+    path: '/'+ category.id,
+    name: category.name,
+    component: views[category.view] ||null,
+    props: true,
+    children: [
+      {
+        path: ':id',
+        name: 'Article',
+        props: true,
+        component: views[category.view]||null
+      }
+    ]
+  })),
+  // {
+  //   path: '/boardgame/:id',
+  //       name: 'Article',
+  //       props: true,
+  //       component: BoardGamesView
+  // },  
   {
     path: '/',
     name: 'home',
@@ -16,6 +44,11 @@ const routes = [
     path: '/about',
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  {
+    path: '/test/:id',
+    name: 'ArticleArea',
+    component: ArticleArea
   },
   {
     path: '/blog',
@@ -36,19 +69,13 @@ const routes = [
     path: '/movies',
     name: 'movies',
     component: BlogView
-        // component: () => import('../views/MoviesView.vue')
+    // component: () => import('../views/MoviesView.vue')
   },
   {
     path: '/anime',
     name: 'anime',
     component: BlogView
     // component: () => import('../views/AnimeView.vue')
-  },
-  {
-    path: '/boardgames',
-    name: 'boardgames',
-    // component: BlogView
-    component: BoardGamesView
   },
   {
     path: '/escapegames',

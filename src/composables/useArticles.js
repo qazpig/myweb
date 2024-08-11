@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import MarkdownIt from 'markdown-it';
 import matter from 'gray-matter';
+import { articleCategories } from '@/data/articleCategories';
 
 // 添加这个 polyfill
 if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
@@ -40,18 +41,19 @@ export function useArticle() {
       console.warn('日期格式錯誤');
       return false;
     }
-
     return true;
   }
 
   // 加載單個文章的函數 
   const loadArticle = async (path) => {
+    console.log(path)
     try {
       //加載文章內容
       if (typeof articleModules[path] !== 'function') {
         console.error('Invalid article module:', path);
         return null;
       }
+
       const rawContent = await articleModules[path]();
       console.log('Raw content loaded for:', path);
       const { data, content: markdownContent } = matter(rawContent);
@@ -103,6 +105,18 @@ export function useArticle() {
     }
   };
 
+  //找到路徑
+  const getArticlePath = (id) =>{
+    // const categories = ['boardgames', 'movies', 'anime', 'escapegames'];
+    for (const category of articleCategories) {
+      const path = `/src/assets/article/${category.id}/${id}.md`;
+      if (articleModules[path]) {
+        return path;
+      }
+    }
+    throw new Error(`Article with id ${id} not found`);
+  }
+
   const getArticlesByCategory = (category) => {
     // 定義按類別獲取文章的函數
     return articles.value.filter(article =>
@@ -124,7 +138,8 @@ export function useArticle() {
     loadArticles,
     loadArticle,
     getArticlesByCategory,
-    getArticlesByTag
+    getArticlesByTag,
+    getArticlePath
   }
 
 }

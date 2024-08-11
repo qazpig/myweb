@@ -3,13 +3,15 @@
     <header class="header">
       <h1>桌遊評論天地</h1>
     </header>
-    <WebHeader/>
+    <!-- <WebHeader/> -->
     <div class="container">
-      <main class="main-content">
+      <main class="main-content" >
         <div v-if="articleStore.loading">載入中...</div>
         <div v-else-if="articleStore.error">
           錯誤訊息：{{ articleStore.error }}
         </div>
+        <ArticleArea v-else-if="articleId"></ArticleArea>
+        <!-- <div v-else-if=""></div> -->
         <div v-else>
           <div
             v-for="game in articleStore.articles"
@@ -72,12 +74,19 @@
 <script setup>
 import { ref, onMounted ,watch } from "vue";
 import { useArticleStore } from "@/stores/articleStore";
-import WebHeader from "@/components/WebHeader.vue";
+// import WebHeader from "@/components/WebHeader.vue";
+import ArticleArea from "@/components/ArticleArea.vue";
 
 const articleStore = useArticleStore();
+
+console.log(articleStore);
+
 // 遊戲類型和難度等級
 const gameTypes = ["策略", "家庭", "派對", "合作"];
 const difficultyLevels = ["入門", "中等", "專家"];
+
+// const articleId = computed(this.id)
+// console.log('articleId:'+articleId.value);
 
 //
 onMounted(async () => {

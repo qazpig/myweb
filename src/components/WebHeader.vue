@@ -23,6 +23,7 @@ export default {
       navLinks: [
         { to: '/', text: 'Home' },
         { to: '/blog', text: 'Blog' },
+        { to: '/edudairy', text: 'Edu'},
         { to: '/movies', text: 'Movies' },
         { to: '/anime', text: 'Anime' },
         { to: '/boardgames', text: 'Board Games' },

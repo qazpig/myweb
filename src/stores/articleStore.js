@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useArticle } from "@/composables/useArticles";
+import { articleCategories } from "@/data/articleCategories";
 
 //導出名為article的store
 export const useArticleStore = defineStore('article', {
@@ -7,12 +8,16 @@ export const useArticleStore = defineStore('article', {
   //視作為data
   state: () => ({
     articles: [],
+    articleCategories: articleCategories,
     loading: false,
     error: null,
   }),
 
+
   //視作為compute屬性
   getters: {
+    //他返回一個函數，這個函數接受一個id參數
+    //他返回的函數使用Array.find()在state.articles查找id
     getArticleById: (state) => (id) => state.articles.find(article => article.id === id) || null,
 
     getArticlesByCategory: (state) => (category) => {
@@ -76,20 +81,26 @@ export const useArticleStore = defineStore('article', {
 
     //可以透過ID加載單篇文章
     async fetchArticleById(id) {
-      if (this.getArticleById(id)) {
-        console.log("用什麼ID拿",id)
-        return;
+      console.log('進來fetcharticlebyid ID:'+id)
+      const existingArticle = this.getArticleById(id);
+      if (existingArticle) {
+        return existingArticle;
       }
+    
       this.loading = true
       this.error = null
       try {
-        const { loadArticle } = useArticle();
-        const article = await loadArticle({ id });
+        const { loadArticle, getArticlePath } = useArticle();
+        const path = getArticlePath(id);
+        console.log(path)
+        const article = await loadArticle(path);
         if (article) {
           this.articles.push(article);
+          return article
         }
       } catch (err) {
         // 如果發生錯誤，存儲錯誤信息，包含具體的文章 id
+        console.error(`Error loading article ${id}:`, err);
         this.error = err.message || `加載文章 ${id} 時出錯`;
       } finally {
         this.loading = false;
