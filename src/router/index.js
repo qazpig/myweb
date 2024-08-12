@@ -4,7 +4,7 @@ import BlogView from '../views/BlogView.vue'
 // import BlogAdminView from '../views/BlogAdminView.vue'
 import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
 import NewArticleView from '@/views/NewArticleView.vue'
-import ArticleArea from '@/components/ArticleArea.vue'
+// import ArticleArea from '@/components/ArticleArea.vue'
 import { articleCategories } from '@/data/articleCategories.js'
 // import BoardGamesView from '@/views/BoardGamesView.vue'
 
