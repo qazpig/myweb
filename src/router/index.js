@@ -1,52 +1,46 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
-// import BlogAdminView from '../views/BlogAdminView.vue'
 import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
-import NewArticleView from '@/views/NewArticleView.vue'
-// import ArticleArea from '@/components/ArticleArea.vue'
 import { articleCategories } from '@/data/articleCategories.js'
+import NewArticle from '@/views/NewArticle.vue'
+import CategoryView from '@/views/CategoryView.vue'
+// import ArticleArea from '@/components/ArticleArea.vue'
+// import BlogAdminView from '../views/BlogAdminView.vue'
 // import BoardGamesView from '@/views/BoardGamesView.vue'
 
 console.log(articleCategories);
 
 
 const routes = [
-  {
-    path: '/:category',
-    name: 'Category',
-    component:()=>import('@/views/BoardGamesView.vue'),
-    props: true,
-    children:[
-      {
-        path: ':id',
-        name: 'Article',
-        component: ()=> import('@/views/BoardGamesView.vue'),
-        props: true 
-      }
-    ]
-  },
-
-  // ...articleCategories.map(category =>({
-  //   path: '/'+ category.id,
-  //   name: category.name,
-  //   component: views[category.view] ||null,
+  // {
+  //   path: '/:category',
+  //   name: 'Category',
+  //   component:()=>import('@/views/BoardGamesView.vue'),
   //   props: true,
-  //   children: [
+  //   children:[
   //     {
   //       path: ':id',
   //       name: 'Article',
-  //       props: true,
-  //       component: views[category.view]||null
+  //       component: ()=> import('@/views/BoardGamesView.vue'),
+  //       props: true 
   //     }
   //   ]
-  // })),
-  // // {
-  //   path: '/boardgame/:id',
-  //       name: 'Article',
-  //       props: true,
-  //       component: BoardGamesView
-  // },  
+  // },
+  ...articleCategories.map(category =>({
+    path: `/${category.id}`,
+    name: category.name,
+    component: CategoryView,
+    props: () => ({category: category.id}),
+    children: [
+      {
+        path: ':id',
+        name: `${category.id}Article`,
+        component: CategoryView,
+        props: route => ({category: category.id, articleID: route.params.id}),
+      }
+    ]
+  })),
   {
     path: '/',
     name: 'home',
@@ -68,9 +62,9 @@ const routes = [
     component: BlogView
   },
   {
-    path: '/new-article',
-    name: 'NewArticle',
-    component: NewArticleView
+    path: '/newarticle',
+    name: 'Newarticle',
+    component: NewArticle
   },
   {
     path: '/movies',

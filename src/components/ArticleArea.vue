@@ -9,14 +9,15 @@
       <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
     </div>
     <div class="content" v-html="article.renderedContent"></div>
+    <router-link :to="'.'" class="back-to-list"> 回到文章列表</router-link>
   </article>
   <div v-else>Loading...</div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useArticleStore } from '@/stores/articleStore';
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useArticleStore } from "@/stores/articleStore";
 // import { formatDate } from '@/utils/dateFormatter'; // 假設我們有一個日期格式化工具
 
 const route = useRoute();
@@ -25,9 +26,9 @@ const article = ref(null);
 
 const loadArticle = async () => {
   const id = route.params.id;
-  console.log(id)
+  console.log(id);
   article.value = await articleStore.fetchArticleById(id);
-  console.log(id)
+  console.log(id);
 };
 
 onMounted(loadArticle);

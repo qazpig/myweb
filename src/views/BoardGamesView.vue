@@ -3,7 +3,7 @@
     <header class="header">
       <h1>{{props.category.name}}桌遊評論天地</h1>
     </header>
-    <!-- <WebHeader/> -->
+    <WebHeader/>
     <div class="container">
       <main class="main-content" >
         <div v-if="articleStore.loading">載入中...</div>
@@ -25,8 +25,11 @@
                 玩家人數: {{ game.players }} | 遊戲時長: {{ game.duration }} |
                 難度: {{ game.difficulty }}
               </div>
-              <p>{{ game.description }}32132</p>
-              <router-link :to="`/blog/${game.id}`" class="read-more"
+              <p>{{ game.description }}</p>
+              <!-- <router-link :to="`${route.path}/${game.id}`" class="read-more"
+                >閱讀更多</router-link
+              > -->
+              <router-link :to="`${game.id}`" class="read-more"
                 >閱讀更多</router-link
               >
             </div>
@@ -74,9 +77,11 @@
 <script setup>
 import { ref, onMounted ,watch, computed, defineProps } from "vue";
 import { useArticleStore } from "@/stores/articleStore";
-// import WebHeader from "@/components/WebHeader.vue";
+import WebHeader from "@/components/WebHeader.vue";
 import ArticleArea from "@/components/ArticleArea.vue";
 
+// import { useRoute } from "vue-router";
+// const route = useRoute();
 //看不懂
 const props = defineProps({
   category: {
