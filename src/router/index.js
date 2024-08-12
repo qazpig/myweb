@@ -1,11 +1,52 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import BlogView from '../views/BlogView.vue'
-import BlogAdminView from '../views/BlogAdminView.vue'
-import BoardGamesView from '@/views/BoardGamesView.vue'
-import NewArticle from '@/views/NewArticle.vue'
+// import BlogAdminView from '../views/BlogAdminView.vue'
+import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
+import NewArticleView from '@/views/NewArticleView.vue'
+// import ArticleArea from '@/components/ArticleArea.vue'
+import { articleCategories } from '@/data/articleCategories.js'
+// import BoardGamesView from '@/views/BoardGamesView.vue'
+
+console.log(articleCategories);
+
 
 const routes = [
+  {
+    path: '/:category',
+    name: 'Category',
+    component:()=>import('@/views/BoardGamesView.vue'),
+    props: true,
+    children:[
+      {
+        path: ':id',
+        name: 'Article',
+        component: ()=> import('@/views/BoardGamesView.vue'),
+        props: true 
+      }
+    ]
+  },
+
+  // ...articleCategories.map(category =>({
+  //   path: '/'+ category.id,
+  //   name: category.name,
+  //   component: views[category.view] ||null,
+  //   props: true,
+  //   children: [
+  //     {
+  //       path: ':id',
+  //       name: 'Article',
+  //       props: true,
+  //       component: views[category.view]||null
+  //     }
+  //   ]
+  // })),
+  // // {
+  //   path: '/boardgame/:id',
+  //       name: 'Article',
+  //       props: true,
+  //       component: BoardGamesView
+  // },  
   {
     path: '/',
     name: 'home',
@@ -15,11 +56,6 @@ const routes = [
     path: '/about',
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-  {
-    path: '/newArticle',
-    name:'NewArticle',
-    component: NewArticle
   },
   {
     path: '/blog',
@@ -32,15 +68,15 @@ const routes = [
     component: BlogView
   },
   {
-    path: '/admin',
-    name: 'BlogAdmin',
-    component: BlogAdminView
+    path: '/new-article',
+    name: 'NewArticle',
+    component: NewArticleView
   },
   {
     path: '/movies',
     name: 'movies',
     component: BlogView
-        // component: () => import('../views/MoviesView.vue')
+    // component: () => import('../views/MoviesView.vue')
   },
   {
     path: '/anime',
@@ -49,16 +85,15 @@ const routes = [
     // component: () => import('../views/AnimeView.vue')
   },
   {
-    path: '/boardgames',
-    name: 'boardgames',
-    // component: BlogView
-    component: BoardGamesView
-  },
-  {
     path: '/escapegames',
     name: 'escapegames',
     component: BlogView
     // component: () => import('../views/EscapeGamesView.vue')
+  },
+  {
+    path: '/manage',
+    name: 'manage',
+    component: TagAndFrontMatterManager
   }
 ]
 

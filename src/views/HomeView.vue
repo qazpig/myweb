@@ -43,16 +43,18 @@
 
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted,computed } from "vue";
 import WebHeader from "../components/WebHeader.vue";
-import { useArticle } from "../methods/useArticles";
+import { useArticleStore } from "@/stores/articleStore";
 
-//使用 esuArticles 的組合式函數
-const { latestArticles, loading, error, loadArticles } = useArticle();
+//使用 useArticleStore 調用倉庫裡的東東
+const articleStore = useArticleStore();
+const latestArticles = computed(()=>articleStore.articles.slice(0,3))
 
 //組件掛載時加載文章
 onMounted(() => {
-  loadArticles(3); //加載3篇文章
+  articleStore.fetchArticles();
+  console.log("這裡")
 });
 
 //評分星星
