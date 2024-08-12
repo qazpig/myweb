@@ -1,7 +1,7 @@
 <template>
   <div class="board-games">
     <header class="header">
-      <h1>桌遊評論天地</h1>
+      <h1>{{props.category.name}}桌遊評論天地</h1>
     </header>
     <!-- <WebHeader/> -->
     <div class="container">
@@ -10,7 +10,7 @@
         <div v-else-if="articleStore.error">
           錯誤訊息：{{ articleStore.error }}
         </div>
-        <ArticleArea v-else-if="articleId"></ArticleArea>
+        <ArticleArea v-else-if="showArticle" :category="props.category" :articleId="props.articleId"></ArticleArea>
         <!-- <div v-else-if=""></div> -->
         <div v-else>
           <div
@@ -72,12 +72,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted ,watch } from "vue";
+import { ref, onMounted ,watch, computed, defineProps } from "vue";
 import { useArticleStore } from "@/stores/articleStore";
 // import WebHeader from "@/components/WebHeader.vue";
 import ArticleArea from "@/components/ArticleArea.vue";
 
+//看不懂
+const props = defineProps({
+  category: {
+    type: Object,
+    required: true
+  },
+  articleId: {
+    type: String,
+    default: null
+  }
+});
+
 const articleStore = useArticleStore();
+
+const showArticle = computed(()=>!!props.articleId);
 
 console.log(articleStore);
 
@@ -90,9 +104,14 @@ const difficultyLevels = ["入門", "中等", "專家"];
 
 //
 onMounted(async () => {
-  console.log("Component mounted, fetching articles...");
-  await articleStore.fetchArticles();
-  console.log("Articles after fetch:", articleStore.articles);
+  if(showArticle.value){
+    await articleStore.fetchArticleById(props.articleId);
+  } else {
+    await articleStore.fetchArticles(props.category.id);
+  }
+  // console.log("Component mounted, fetching articles...");
+  // await articleStore.fetchArticles();
+  // console.log("Articles after fetch:", articleStore.articles);
 });
 
 watch(() => articleStore.articles, (newArticles) => {
@@ -125,18 +144,7 @@ const toggleFilter = (category, value) => {
   }
 };
 
-// 過濾遊戲
-// const filteredGames = computed(() => {
-//   return articles.value.filter((game) => {
-//     const typeMatch =
-//       activeFilters.value.type.length === 0 ||
-//       activeFilters.value.type.includes(game.type);
-//     const difficultyMatch =
-//       activeFilters.value.difficulty.length === 0 ||
-//       activeFilters.value.difficulty.includes(game.difficulty);
-//     return typeMatch && difficultyMatch;
-//   });
-// });
+
 </script>
 
 <style scoped>

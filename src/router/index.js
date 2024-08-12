@@ -6,30 +6,42 @@ import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
 import NewArticleView from '@/views/NewArticleView.vue'
 import ArticleArea from '@/components/ArticleArea.vue'
 import { articleCategories } from '@/data/articleCategories.js'
-import BoardGamesView from '@/views/BoardGamesView.vue'
+// import BoardGamesView from '@/views/BoardGamesView.vue'
 
 console.log(articleCategories);
 
-const views = {
-  BoardGamesView
-};
 
 const routes = [
-  ...articleCategories.map(category =>({
-    path: '/'+ category.id,
-    name: category.name,
-    component: views[category.view] ||null,
+  {
+    path: '/:category',
+    name: 'Category',
+    component:()=>import('@/views/BoardGamesView.vue'),
     props: true,
-    children: [
+    children:[
       {
         path: ':id',
         name: 'Article',
-        props: true,
-        component: views[category.view]||null
+        component: ()=> import('@/views/BoardGamesView.vue'),
+        props: true 
       }
     ]
-  })),
-  // {
+  },
+
+  // ...articleCategories.map(category =>({
+  //   path: '/'+ category.id,
+  //   name: category.name,
+  //   component: views[category.view] ||null,
+  //   props: true,
+  //   children: [
+  //     {
+  //       path: ':id',
+  //       name: 'Article',
+  //       props: true,
+  //       component: views[category.view]||null
+  //     }
+  //   ]
+  // })),
+  // // {
   //   path: '/boardgame/:id',
   //       name: 'Article',
   //       props: true,
