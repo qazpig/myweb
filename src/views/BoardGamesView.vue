@@ -1,42 +1,30 @@
 <template>
-  <div class="board-games">
-    <header class="header">
-      <h1>{{props.category.name}}桌遊評論天地</h1>
-    </header>
-    <WebHeader/>
-    <div class="container">
-      <main class="main-content" >
-        <div v-if="articleStore.loading">載入中...</div>
-        <div v-else-if="articleStore.error">
-          錯誤訊息：{{ articleStore.error }}
-        </div>
-        <ArticleArea v-else-if="showArticle" :category="props.category" :articleId="props.articleId"></ArticleArea>
-        <!-- <div v-else-if=""></div> -->
-        <div v-else>
-          <div
-            v-for="game in articleStore.articles"
-            :key="game.id"
-            class="game-card"
-          >
-            <img :src="game.image" :alt="game.title" />
-            <div class="game-info">
-              <div class="game-title">{{ game.title }}</div>
-              <div class="game-meta">
-                玩家人數: {{ game.players }} | 遊戲時長: {{ game.duration }} |
-                難度: {{ game.difficulty }}
-              </div>
-              <p>{{ game.description }}</p>
-              <!-- <router-link :to="`${route.path}/${game.id}`" class="read-more"
+  <BaseView :category="props.category" :articleId="props.articleId">
+    <template #article-list>
+      <div
+        v-for="game in articleStore.articles"
+        :key="game.id"
+        class="game-card"
+      >
+        <img :src="game.image" :alt="game.title" />
+        <div class="game-info">
+          <div class="game-title">{{ game.title }}</div>
+          <div class="game-meta">
+            玩家人數: {{ game.players }} | 遊戲時長: {{ game.duration }} | 難度:
+            {{ game.difficulty }}
+          </div>
+          <p>{{ game.description }}</p>
+          <!-- <router-link :to="`${route.path}/${game.id}`" class="read-more"
                 >閱讀更多</router-link
               > -->
-              <router-link :to="`${game.id}`" class="read-more"
-                >閱讀更多</router-link
-              >
-            </div>
-          </div>
+          <router-link :to="`/${category.id}/${game.id}`" class="read-more"
+            >閱讀更多</router-link
+          >
         </div>
-      </main>
-      <aside class="sidebar">
+      </div>
+    </template>
+    <template #sidebar-content>
+      <div>
         <div class="filter-section">
           <div class="filter-title">遊戲類型</div>
           <div class="filter-options">
@@ -69,34 +57,41 @@
             </span>
           </div>
         </div>
-      </aside>
-    </div>
-  </div>
+      </div>
+    </template>
+  </BaseView>
 </template>
 
-<script setup>
-import { ref, onMounted ,watch, computed, defineProps } from "vue";
-import { useArticleStore } from "@/stores/articleStore";
-import WebHeader from "@/components/WebHeader.vue";
-import ArticleArea from "@/components/ArticleArea.vue";
 
+
+<script setup>
+import { ref, onMounted, computed, defineProps } from "vue";
+import { useArticleStore } from "@/stores/articleStore";
+// import WebHeader from "@/components/WebHeader.vue";
+// import ArticleArea from "@/components/ArticleArea.vue";
+import BaseView from "../components/BaseView.vue";
+
+//處理路由
 // import { useRoute } from "vue-router";
 // const route = useRoute();
+// const categoryPath = computed(()=>`/${props.category.id}`) ;
+
+
 //看不懂
 const props = defineProps({
   category: {
     type: Object,
-    required: true
+    required: true,
   },
   articleId: {
     type: String,
-    default: null
-  }
+    default: null,
+  },
 });
 
 const articleStore = useArticleStore();
 
-const showArticle = computed(()=>!!props.articleId);
+const showArticle = computed(() => !!props.articleId);
 
 console.log(articleStore);
 
@@ -109,7 +104,7 @@ const difficultyLevels = ["入門", "中等", "專家"];
 
 //
 onMounted(async () => {
-  if(showArticle.value){
+  if (showArticle.value) {
     await articleStore.fetchArticleById(props.articleId);
   } else {
     await articleStore.fetchArticles(props.category.id);
@@ -119,19 +114,31 @@ onMounted(async () => {
   // console.log("Articles after fetch:", articleStore.articles);
 });
 
-watch(() => articleStore.articles, (newArticles) => {
-  console.log('Articles updated in view:', newArticles);
-}, { immediate: true });
+// watch(
+//   () => articleStore.articles,
+//   (newArticles) => {
+//     console.log("Articles updated in view:", newArticles);
+//   },
+//   { immediate: true }
+// );
 
-watch(() => articleStore.loading, (isLoading) => {
-  console.log('Loading status:', isLoading);
-}, { immediate: true });
+// watch(
+//   () => articleStore.loading,
+//   (isLoading) => {
+//     console.log("Loading status:", isLoading);
+//   },
+//   { immediate: true }
+// );
 
-watch(() => articleStore.error, (error) => {
-  if (error) {
-    console.error('Error in article store:', error);
-  }
-}, { immediate: true });
+// watch(
+//   () => articleStore.error,
+//   (error) => {
+//     if (error) {
+//       console.error("Error in article store:", error);
+//     }
+//   },
+//   { immediate: true }
+// );
 
 // 活動過濾器
 const activeFilters = ref({
@@ -148,8 +155,6 @@ const toggleFilter = (category, value) => {
     activeFilters.value[category].push(value);
   }
 };
-
-
 </script>
 
 <style scoped>

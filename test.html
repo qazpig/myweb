@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育主題 - 知識分享平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', '微軟正黑體', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        header {
+            background: #35424a;
+            color: #ffffff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #e8491d 3px solid;
+        }
+        header h1 {
+            margin: 0;
+            text-align: center;
+        }
+        .main-content {
+            float: left;
+            width: 70%;
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+        }
+        .sidebar {
+            float: right;
+            width: 25%;
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .article-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .article-card h2 {
+            margin-top: 0;
+            color: #35424a;
+        }
+        .article-meta {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .read-more {
+            display: inline-block;
+            background: #e8491d;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-top: 10px;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        .filter-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .filter-option {
+            display: inline-block;
+            background: #e8e8e8;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .filter-option.active {
+            background: #35424a;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>教育主題 - 知識分享平台</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <!-- 單篇文章或文章列表將在這裡渲染 -->
+            <div id="articleContent">
+                <div class="article-card">
+                    <h2>探索創新教學方法：翻轉課堂的實踐與成效</h2>
+                    <div class="article-meta">
+                        <span>作者：王小明</span> | 
+                        <span>發布日期：2024-08-15</span> | 
+                        <span>閱讀時間：10分鐘</span>
+                    </div>
+                    <p>翻轉課堂是近年來備受關注的教學模式，它顛覆了傳統的課堂結構，讓學生在家自主學習理論知識，而在課堂上則專注於問題討論和實踐應用...</p>
+                    <a href="#" class="read-more">閱讀全文</a>
+                </div>
+                <!-- 更多文章卡片 -->
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="filter-section">
+                <div class="filter-title">教育階段</div>
+                <div class="filter-options">
+                    <span class="filter-option active">全部</span>
+                    <span class="filter-option">幼兒教育</span>
+                    <span class="filter-option">小學教育</span>
+                    <span class="filter-option">中學教育</span>
+                    <span class="filter-option">高等教育</span>
+                </div>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">主題分類</div>
+                <div class="filter-options">
+                    <span class="filter-option active">全部</span>
+                    <span class="filter-option">教學方法</span>
+                    <span class="filter-option">教育科技</span>
+                    <span class="filter-option">課程設計</span>
+                    <span class="filter-option">學生輔導</span>
+                    <span class="filter-option">教育政策</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // 這裡將來會放置Vue的邏輯
+        // 例如：根據路由決定渲染單篇文章或文章列表
+        // 以及處理過濾器的點擊事件等
+    </script>
+</body>
+</html>

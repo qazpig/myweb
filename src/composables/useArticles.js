@@ -46,7 +46,7 @@ export function useArticle() {
 
   // 加載單個文章的函數 
   const loadArticle = async (path) => {
-    console.log(path)
+    // console.log(path)
     try {
       //加載文章內容
       if (typeof articleModules[path] !== 'function') {
@@ -55,7 +55,7 @@ export function useArticle() {
       }
 
       const rawContent = await articleModules[path]();
-      console.log('Raw content loaded for:', path);
+      // console.log('Raw content loaded for:', path);
       const { data, content: markdownContent } = matter(rawContent);
 
 

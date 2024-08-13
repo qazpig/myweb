@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h1>{{ title }}</h1>
+    <h1>{{ category.name || title }}</h1>
     <nav>
       <router-link v-for="link in navLinks" :key="link.to" :to="link.to">
         {{ link.text }}
@@ -16,6 +16,10 @@ export default {
     title: {
       type: String,
       default: 'My Review Blog'
+    },
+    category:{
+      type: Object,
+      default:() => ({})
     }
   },
   data() {
