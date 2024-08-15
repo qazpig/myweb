@@ -15,8 +15,8 @@
 import { computed, defineProps, defineAsyncComponent } from "vue";
 import { useRoute } from "vue-router";
 import { getArticleCategoryById } from "@/data/articleCategories";
-// import BoardGamesView from './BoardGamesView.vue';
 import WebHeader from "@/components/WebHeader.vue";
+// import BoardGamesView from './BoardGamesView.vue';
 // import MoviesView from './MoviesView.vue';
 // import AnimeView from './AnimeView.vue';
 // import EscapeGamesView from './EscapeGamesView.vue';
