@@ -50,6 +50,7 @@
 <script setup>
 import { computed, reactive, ref } from "vue";
 import MarkdownIt from "markdown-it";
+import markdownItKatex from "markdown-it-katex";
 
 // // 添加这个 polyfill
 // if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
@@ -62,6 +63,10 @@ import MarkdownIt from "markdown-it";
 // }
 
 const md = new MarkdownIt();
+md.use(markdownItKatex, {
+  throwOnError: false,
+  errorColor: "cc0000",
+});
 
 //reactive 管理表單數據
 const post = reactive({

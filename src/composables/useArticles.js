@@ -1,8 +1,10 @@
 //這個JS是為了整合讀取md檔案的文件所建立
 import { ref } from 'vue';
 import MarkdownIt from 'markdown-it';
+import markdownItKatex from 'markdown-it-katex';
 import matter from 'gray-matter';
 import { articleCategories } from '@/data/articleCategories';
+import 'katex/dist/katex.min.css';
 
 // 添加这个 polyfill
 if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
@@ -20,7 +22,15 @@ console.log('Article modules:', Object.keys(articleModules));
 //這應該是我要丟出去的方法
 export function useArticle() {
   // 創建 MarkdownIt 實例
-  const md = new MarkdownIt();
+  const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer:true
+  });
+  md.use(markdownItKatex,{
+    throwOnError:false,
+    errorColor:'cc0000'
+  });
   // 創建響應式引用
   const articles = ref([]);
   const loading = ref(true);

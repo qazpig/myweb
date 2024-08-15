@@ -62,5 +62,6 @@ watch(() => route.params.id, loadArticle);
 
 .content {
   line-height: 1.6;
+  text-align: left;
 }
 </style>
