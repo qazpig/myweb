@@ -1,41 +1,51 @@
 <template>
-  <header>
-    <h1>{{ category.name || title }}</h1>
-    <nav>
-      <router-link v-for="link in navLinks" :key="link.to" :to="link.to">
-        {{ link.text }}
-      </router-link>
-    </nav>
-  </header>
+  <div>
+    <header
+      class="header"
+      :style="{ backgroundColor: currentTheme.headerColor }"
+    >
+      <h1>{{ category.name || props.title }}</h1>
+      <nav>
+        <router-link v-for="link in navLinks" :key="link.to" :to="link.to">
+          {{ link.text }}
+        </router-link>
+      </nav>
+    </header>
+  </div>
 </template>
 
-<script>
-export default {
-  name: 'WebHeader',
-  props: {
-    title: {
-      type: String,
-      default: 'My Review Blog'
-    },
-    category:{
-      type: Object,
-      default:() => ({})
-    }
+
+<script setup>
+import { ref, defineProps, computed } from "vue";
+import { articleCategories } from "@/data/articleCategories";
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: "噗噗的文章泥巴",
   },
-  data() {
-    return {
-      navLinks: [
-        { to: '/', text: 'Home' },
-        { to: '/blog', text: 'Blog' },
-        { to: '/edu', text: 'Edu'},
-        { to: '/movies', text: 'Movies' },
-        { to: '/anime', text: 'Anime' },
-        { to: '/boardgame', text: 'Board Games' },
-        { to: '/escapegames', text: 'Escape Games' }
-      ]
-    }
-  }
-}
+  category: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const currentTheme = computed(() => {
+  const category = articleCategories.find(
+    (category) => category.id === props.category.id
+  );
+  return category ? category.theme : {};
+});
+
+const navLinks = ref([
+  { to: "/", text: "Home" },
+  // { to: "/blog", text: "Blog" },
+  { to: "/edu", text: "Edu" },
+  { to: "/movies", text: "Movies" },
+  { to: "/anime", text: "Anime" },
+  { to: "/boardgame", text: "Board Games" },
+  { to: "/escapegames", text: "Escape Games" },
+]);
 </script>
 
 <style scoped>

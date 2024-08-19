@@ -14,9 +14,12 @@
             {{ game.difficulty }}
           </div>
           <p>{{ game.description }}</p>
-          <!-- <router-link :to="`${route.path}/${game.id}`" class="read-more"
-                >閱讀更多</router-link
-              > -->
+          <div class="game-preview">
+            <MdPreview
+              :model-value="getPreviewContent(game.content)"
+              :previewOnly="true"
+            ></MdPreview>
+          </div>
           <router-link :to="`/${category.id}/${game.id}`" class="read-more"
             >閱讀更多</router-link
           >
@@ -70,14 +73,15 @@ import { useArticleStore } from "@/stores/articleStore";
 // import WebHeader from "@/components/WebHeader.vue";
 // import ArticleArea from "@/components/ArticleArea.vue";
 import BaseView from "../components/BaseView.vue";
+import { MdPreview } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
 
 //處理路由
 // import { useRoute } from "vue-router";
 // const route = useRoute();
 // const categoryPath = computed(()=>`/${props.category.id}`) ;
 
-
-//看不懂
+//身為子物件，父物件需要傳遞進來的資訊，也就是手套
 const props = defineProps({
   category: {
     type: Object,
@@ -90,10 +94,9 @@ const props = defineProps({
 });
 
 const articleStore = useArticleStore();
+console.log(articleStore);
 
 const showArticle = computed(() => !!props.articleId);
-
-console.log(articleStore);
 
 // 遊戲類型和難度等級
 const gameTypes = ["策略", "家庭", "派對", "合作"];
@@ -114,6 +117,35 @@ onMounted(async () => {
   // console.log("Articles after fetch:", articleStore.articles);
 });
 
+const getPreviewContent = (content) => {
+  // console.log('獲取文章內容'+content)
+  // 移除 Markdown 語法
+  const plainText = content
+    .replace(/^#+\s+/gm, "") // 移除標題
+    .replace(/(\*\*|__)(.*?)\1/g, "$2") // 移除粗體
+    .replace(/(\*|_)(.*?)\1/g, "$2") // 移除斜體
+    // .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // 移除鏈接，只保留文本
+    .replace(/^>+\s+/gm, "") // 移除引用
+    .replace(/^[*-+]\s+/gm, "") // 移除無序列表
+    .replace(/^\d+\.\s+/gm, "") // 移除有序列表
+    .replace(/`{1,3}[^`\n]+`{1,3}/g, "") // 移除行內代碼
+    .replace(/```[\s\S]*?```/g, "") // 移除代碼塊
+    // .replace(/!\[([^\]]+)\]\([^\)]+\)/g, "") // 移除圖片
+    .trim();
+
+  // // 尋找第一個段落
+  // const firstParagraph = plainText.split(/\n\s*\n/)[1];
+
+  // 如果段落太長，截取適當長度
+  const maxLength = 300;
+  if (plainText.length > maxLength) {
+    return plainText.substring(0, maxLength) + "...";
+  }
+
+  return plainText;
+};
+
+//下方為監聽資訊
 // watch(
 //   () => articleStore.articles,
 //   (newArticles) => {
@@ -158,6 +190,19 @@ const toggleFilter = (category, value) => {
 </script>
 
 <style scoped>
+/* 確保 MdPreview 在遊戲卡片中有合適的樣式 */
+.game-preview {
+  max-height: 100px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* 使 MdPreview 的樣式與您的設計保持一致 */
+:deep(.md-preview) {
+  background-color: transparent;
+  padding: 0;
+}
+
 .board-games {
   font-family: Arial, sans-serif;
   background-color: #f5e6d3;

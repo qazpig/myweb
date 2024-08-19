@@ -25,20 +25,10 @@
           max="5"
         />
       </div>
-      <div class="editor-preview-container">
-        <div class="editor">
-          <label for="content">Content:</label>
-          <textarea
-            v-model="post.content"
-            id="content"
-            rows="20"
-            required
-          ></textarea>
-        </div>
-        <div class="preview">
-          <h3>Preview</h3>
-          <div v-html="renderedContent"></div>
-        </div>
+
+      <div class="form-group">
+        <label for="content">Content:</label>
+        <MdEditor v-model="editorText" ></MdEditor>
       </div>
       <button type="submit">Create Markdown File</button>
     </form>
@@ -48,25 +38,15 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
-import MarkdownIt from "markdown-it";
-import markdownItKatex from "markdown-it-katex";
+import {  reactive, ref } from "vue";
+import { MdEditor } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
 
-// // 添加这个 polyfill
-// if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
-//   window.Buffer = {
+// import MarkdownIt from "markdown-it";
+// const md = new MarkdownIt();
 
-//     from: function(str) {
-//       return str;
-//     }
-//   };
-// }
 
-const md = new MarkdownIt();
-md.use(markdownItKatex, {
-  throwOnError: false,
-  errorColor: "cc0000",
-});
+const editorText = ref("# Hello");
 
 //reactive 管理表單數據
 const post = reactive({
@@ -76,10 +56,6 @@ const post = reactive({
   rating: "",
   content: "",
 });
-
-const renderedContent = computed(() => md.render(post.content));
-// console.log(post.content);
-// console.log(renderedContent);
 
 // 使用 ref 來管理錯誤消息
 const errorMessage = ref("");
@@ -94,8 +70,9 @@ rating: ${post.rating}
 ---
 `;
   //組合起完整的MD內容
-  const markdownContent = frontMatter + post.content;
-
+  const markdownContent = frontMatter + editorText.value;
+  console.log(editorText);
+  console.log(markdownContent);
   try {
     //使用File Sstem Access API
     await saveWithFileSystem(markdownContent);

@@ -5,9 +5,54 @@ date: "2023-05-15"
 category: BoardGame
 ---
 
-# $噗噗噗$
+
 
 $\frac{2}{3}$
+```javascript=
+const routes = [
+  {
+    path: '/:category',  
+    name: 'Category',  
+    component: CategoryView,
+    props: true
+  },
+  {
+    path: '/:category/:id',
+    name: 'Article',
+    component: CategoryView,
+    props: route => ({ 
+      category: route.params.category, 
+      articleId: route.params.id 
+    })
+  }
+]
+```
+== props ==
+
+==dsfsdf==
+
+'sdf'
+
+''asfasf''
+`jkjh`kjh
+``jkhkjh``kj
+
+-sdf-
+--sdfsdf--
+~~dsfkj~~
+*sds
+*sd
+*s
+*sd*sd*sd**
+
+*sd
+*sd*
+
+
+
+
+
+
 
 ## 文章測試
 

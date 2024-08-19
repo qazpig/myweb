@@ -1,34 +1,52 @@
 <template>
-  <article v-if="article" class="single-article">
-    <h1>{{ article.title }}</h1>
-    <div class="meta">
-      <!-- <span class="date">{{ formatDate(article.date) }}</span> -->
-      <span v-if="article.author" class="author">by {{ article.author }}</span>
-    </div>
-    <div v-if="article.tags" class="tags">
-      <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
-    </div>
-    <div class="content" v-html="article.renderedContent"></div>
-    <router-link :to="'.'" class="back-to-list"> 回到文章列表</router-link>
-  </article>
-  <div v-else>Loading...</div>
+  <div class="article-area">
+    <div v-if="loading">加載中...</div>
+    <div v-else-if="error">載入文章時發生錯誤：{{ error }}</div>
+    <article v-else-if="article" class="single-article">
+      <h1>{{ article.title }}</h1>
+      <div class="meta">
+        <span v-if="article.author" class="author">by {{ article.author }}</span>
+      </div>
+      <div v-if="article.tags" class="tags">
+        <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
+      </div>
+      <div class="content">
+        <MdPreview :modelValue="article.content" />
+      </div>
+      <router-link :to="'.'" class="back-to-list">回到文章列表</router-link>
+    </article>
+    <div v-else>未找到文章</div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useArticleStore } from "@/stores/articleStore";
-// import { formatDate } from '@/utils/dateFormatter'; // 假設我們有一個日期格式化工具
+import { MdPreview } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 const route = useRoute();
 const articleStore = useArticleStore();
 const article = ref(null);
+const loading = ref(true);
+const error = ref(null);
 
 const loadArticle = async () => {
-  const id = route.params.id;
-  console.log(id);
-  article.value = await articleStore.fetchArticleById(id);
-  console.log(id);
+  loading.value = true;
+  error.value = null;
+  try {
+    const id = route.params.id;
+    article.value = await articleStore.fetchArticleById(id);
+    if (!article.value) {
+      throw new Error('文章未找到');
+    }
+  } catch (e) {
+    console.error('加載文章時發生錯誤:', e);
+    error.value = e.message || '加載文章失敗';
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(loadArticle);

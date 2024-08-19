@@ -1,15 +1,22 @@
 <template>
-  <div class="base-view">
-    <header class="header">
+  <div class="base-view" :style="themeStyles">
+    <!-- <header
+      class="header"
+      :style="{ backgroundColor: currentTheme.headerColor }"
+    >
       <h1>{{ props.category.name }}</h1>
-    </header>
+    </header> -->
     <div class="container">
       <main class="main-content">
         <div v-if="articleStore.loading">載入中...</div>
         <div v-else-if="articleStore.error">
           錯誤訊息：{{ articleStore.error }}
         </div>
-        <ArticleArea v-else-if="showArticle" :category="props.category" :articleId="props.articleId"></ArticleArea>
+        <ArticleArea
+          v-else-if="showArticle"
+          :category="props.category"
+          :articleId="props.articleId"
+        ></ArticleArea>
         <slot v-else name="article-list"></slot>
       </main>
       <aside class="sidebar">
@@ -20,24 +27,31 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch,defineProps } from "vue";
+import { computed, onMounted, watch, defineProps } from "vue";
 import { useArticleStore } from "@/stores/articleStore";
 import ArticleArea from "@/components/ArticleArea.vue";
+// import { articleCategories } from "@/data/articleCategories";
 
 const props = defineProps({
   category: {
     type: Object,
-    required: true
+    required: true,
   },
   articleId: {
     type: String,
-    default: null
-  }
+    default: null,
+  },
 });
 
 const articleStore = useArticleStore();
 
 const showArticle = computed(() => !!props.articleId);
+
+// const currentTheme = computed(() => {
+//   const category = articleCategories.find(
+//     (category => category.id === props.category.id));
+//   return category ? category.theme : {};
+// });
 
 onMounted(async () => {
   if (showArticle.value) {
@@ -47,19 +61,31 @@ onMounted(async () => {
   }
 });
 
-watch(() => articleStore.articles, (newArticles) => {
-  console.log('Articles updated in view:', newArticles);
-}, { immediate: true });
+watch(
+  () => articleStore.articles,
+  (newArticles) => {
+    console.log("Articles updated in view:", newArticles);
+  },
+  { immediate: true }
+);
 
-watch(() => articleStore.loading, (isLoading) => {
-  console.log('Loading status:', isLoading);
-}, { immediate: true });
+watch(
+  () => articleStore.loading,
+  (isLoading) => {
+    console.log("Loading status:", isLoading);
+  },
+  { immediate: true }
+);
 
-watch(() => articleStore.error, (error) => {
-  if (error) {
-    console.error('Error in article store:', error);
-  }
-}, { immediate: true });
+watch(
+  () => articleStore.error,
+  (error) => {
+    if (error) {
+      console.error("Error in article store:", error);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
@@ -70,10 +96,11 @@ watch(() => articleStore.error, (error) => {
 }
 
 .header {
-  background-color: #8b4513;
+  /* background-color: white; */
   color: white;
   padding: 20px;
   text-align: center;
+  transition: background-color 0.3s ease;
 }
 
 .container {
