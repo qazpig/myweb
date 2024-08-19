@@ -5,6 +5,7 @@ import TagAndFrontMatterManager from '@/views/TagAndFrontMatterManager.vue'
 import { articleCategories } from '@/data/articleCategories.js'
 import NewArticle from '@/views/NewArticle.vue'
 import CategoryView from '@/views/CategoryView.vue'
+import TagManager from '@/views/TagManager.vue'
 // import ArticleArea from '@/components/ArticleArea.vue'
 // import BlogAdminView from '../views/BlogAdminView.vue'
 // import BoardGamesView from '@/views/BoardGamesView.vue'
@@ -88,7 +89,13 @@ const routes = [
     path: '/manage',
     name: 'manage',
     component: TagAndFrontMatterManager
-  }
+  },
+  {
+    path: '/tagmanager',
+    name: 'tagmanager',
+    component: TagManager
+  },
+
 ]
 
 const router = createRouter({
