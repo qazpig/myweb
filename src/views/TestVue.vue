@@ -2,55 +2,76 @@
   <div class="blog-post-editor">
     <h2>Create New Blog Post</h2>
     <form @submit.prevent="createMarkdownFile">
-      <div class="form-group">
-        <label for="title">Title:</label>
-        <input v-model="post.title" id="title" required />
+      <!-- 標題和日期區塊 -->
+      <div class="form-row">
+        <div class="form-group title-group">
+          <label for="title">Title:</label>
+          <input v-model="post.title" id="title" required />
+        </div>
+        <div class="form-group date-group">
+          <label for="date">Date:</label>
+          <input v-model="post.date" id="date" type="date" required />
+        </div>
       </div>
-      <div class="form-group">
-        <label for="date">Date:</label>
-        <input v-model="post.date" id="date" type="date" required />
+
+      <!-- 類別和評分區塊 -->
+      <div class="form-row">
+        <div class="form-group category-group">
+          <label for="category">Category:</label>
+          <select v-model="post.category" id="category" required>
+            <option value="">Select a category</option>
+            <option value="boardgame">Board Game</option>
+            <option value="movie">Movie</option>
+            <option value="anime">Anime</option>
+            <option value="escapegame">Escape Game</option>
+          </select>
+        </div>
+        <div class="form-group rating-group">
+          <label for="rating">Rating:</label>
+          <input
+            v-model="post.rating"
+            id="rating"
+            type="number"
+            step="0.1"
+            min="0"
+            max="5"
+          />
+        </div>
       </div>
+
+      <!-- 標籤選擇區塊 -->
       <div class="form-group">
-        <label for="category">Category:</label>
-        <input v-model="post.category" id="category" required />
-      </div>
-      <div class="form-group">
-      <label>標籤：</label>
-      <div class="tag-tree">
-        <div v-for="category in tagCategories" :key="category" class="tag-category">
-          <h3>{{ getCategoryName(category) }}</h3>
-          <div v-for="tag in getCategoryTags(category)" :key="tag.id" class="tag-item" :style="{ marginLeft: `${getTagLevel(tag) * 20}px` }">
-            <label :class="{ 'parent-tag': !tag.parentId }">
-              <input type="checkbox" :value="tag.id" v-model="selectedTags">
-              {{ tag.name }}
-            </label>
-            <button v-if="hasChildren(tag)" @click="toggleChildren(tag)" class="toggle-btn">
-              {{ isExpanded(tag) ? '−' : '+' }}
-            </button>
+        <label>標籤：</label>
+        <div class="tag-tree">
+          <div v-for="category in tagCategories" :key="category" class="tag-category">
+            <h3>{{ getCategoryName(category) }}</h3>
+            <div v-for="tag in getCategoryTags(category)" :key="tag.id" class="tag-item" :style="{ marginLeft: `${getTagLevel(tag) * 20}px` }">
+              <label :class="{ 'parent-tag': !tag.parentId }">
+                <input type="checkbox" :value="tag.id" v-model="selectedTags">
+                {{ tag.name }}
+              </label>
+              <button v-if="hasChildren(tag)" @click.prevent="toggleChildren(tag)" class="toggle-btn" type="button">
+                {{ isExpanded(tag) ? '−' : '+' }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-      <div class="form-group">
-        <label for="rating">Rating:</label>
-        <input
-          v-model="post.rating"
-          id="rating"
-          type="number"
-          step="0.1"
-          min="0"
-          max="5"
-        />
-      </div>
 
+      <!-- 文章內容編輯器 -->
       <div class="form-group">
         <label for="content">Content:</label>
         <MdEditor v-model="editorText"></MdEditor>
       </div>
-      <button type="submit">Create Markdown File</button>
-      <button @click="cleanDraft">清除草稿</button>
+
+      <!-- 表單操作按鈕 -->
+      <div class="form-actions">
+        <button type="submit">Create Markdown File</button>
+        <button @click.prevent="cleanDraft" type="button">清除草稿</button>
+      </div>
     </form>
-    <!-- 添加錯誤消息顯示 -->
+
+    <!-- 錯誤訊息顯示 -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
@@ -60,23 +81,23 @@ import { computed, onMounted, reactive, ref, watch } from "vue";
 import { MdEditor } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import { useTagStore } from "@/stores/tagStore";
-const tagStore = useTagStore();
-
 import { storeToRefs } from "pinia";
+
+// 初始化 tag store
+const tagStore = useTagStore();
 const { tags } = storeToRefs(tagStore);
 
-console.log("這是tagStore的資料:", tagStore);
-console.log("這是tag的資料:", tags.value);
-
-//管理文章標籤的響應式引用
+// 用於管理文章標籤的響應式引用
 const selectedTags = ref([]);
 
+// 用於管理展開的標籤
 const expandedTags = ref(new Set());
 
+// 計算屬性：獲取所有標籤類別
 const tagCategories = computed(() => [...new Set(tags.value.map(tag => tag.category))]);
 
+// 獲取類別名稱的中文翻譯
 const getCategoryName = (category) => {
-  // 將類別名稱映射為中文
   const categoryNames = {
     boardgame: '桌遊',
     movie: '電影',
@@ -86,10 +107,12 @@ const getCategoryName = (category) => {
   return categoryNames[category] || category;
 };
 
+// 獲取特定類別的標籤
 const getCategoryTags = (category) => {
   return tags.value.filter(tag => tag.category === category);
 };
 
+// 獲取標籤的層級
 const getTagLevel = (tag) => {
   let level = 0;
   let currentTag = tag;
@@ -100,14 +123,17 @@ const getTagLevel = (tag) => {
   return level;
 };
 
+// 檢查標籤是否有子標籤
 const hasChildren = (tag) => {
   return tags.value.some(t => t.parentId === tag.id);
 };
 
+// 檢查標籤是否已展開
 const isExpanded = (tag) => {
   return expandedTags.value.has(tag.id);
 };
 
+// 切換標籤的展開/收起狀態
 const toggleChildren = (tag) => {
   if (expandedTags.value.has(tag.id)) {
     expandedTags.value.delete(tag.id);
@@ -116,44 +142,10 @@ const toggleChildren = (tag) => {
   }
 };
 
-//計算屬性：標籤層級關係
-// const hierarchicalTags = computed(() => {
-//   const tagMap = new Map(
-//     tags.value.map((tag) => [tag.id, { ...tag, level: 0, children: [] }])
-//   );
-//   const rootTags = [];
-
-//   for (const tag of tagMap.values()) {
-//     if (tag.parentId) {
-//       const parent = tagMap.get(tag.parentId);
-//       if (parent) {
-//         parent.children.push(tag);
-//         tag.level = parent.level + 1;
-//       } else {
-//         rootTags.push(tag);
-//       }
-//     } else {
-//       rootTags.push(tag);
-//     }
-//   }
-
-//   function flattenTags(tags, result = []) {
-//     for (const tag of tags) {
-//       result.push(tag);
-//       if (tag.children.length > 0) {
-//         flattenTags(tag.children, result);
-//       }
-//     }
-//     return result;
-//   }
-
-//   return flattenTags(rootTags);
-// });
-
-//編輯中的文字
+// 編輯器內容
 const editorText = ref("# Hello");
 
-//reactive 管理表單數據
+// 表單數據
 const post = reactive({
   title: "",
   date: "",
@@ -162,11 +154,12 @@ const post = reactive({
   content: "",
 });
 
-// 使用 ref 來管理錯誤消息
+// 錯誤訊息
 const errorMessage = ref("");
 
-// 新增：從 localStorage 讀取草稿
+// 組件掛載時的操作
 onMounted(async () => {
+  // 從 localStorage 讀取草稿
   const savedDraft = localStorage.getItem("articleDraft");
   if (savedDraft) {
     const parsedDraft = JSON.parse(savedDraft);
@@ -174,61 +167,50 @@ onMounted(async () => {
     editorText.value = parsedDraft.content || "";
     selectedTags.value = parsedDraft.tags || [];
   }
+  // 獲取標籤數據
   await tagStore.fetchTags();
 });
 
-// 新增：監聽變化並保存到 localStorage
+// 監聽表單變化並保存到 localStorage
 watch(
   [post, editorText],
   () => {
-    // console.log('更新更新')
     const draftToSave = {
       ...post,
       tags: selectedTags.value,
       content: editorText.value,
     };
-    console.log(selectedTags.value);
     localStorage.setItem("articleDraft", JSON.stringify(draftToSave));
   },
   { deep: true }
 );
 
-// 創建 Markdown 文件的主函數
+// 創建 Markdown 文件
 async function createMarkdownFile() {
   const frontMatter = `---
 title: "${post.title}"
 date: "${post.date}"
 category: "${post.category}"
-tags:[${selectedTags.value
-    .map((id) => `"${tagStore.getTagById(id).name}"`)
-    .join(", ")}]
+tags: [${selectedTags.value.map((id) => `"${tagStore.getTagById(id).name}"`).join(", ")}]
 rating: ${post.rating}
 ---
 `;
-  //組合起完整的MD內容
   const markdownContent = frontMatter + editorText.value;
 
-  // console.log(editorText);
-  // console.log(markdownContent);
   try {
-    //使用File Sstem Access API
     await saveWithFileSystem(markdownContent);
   } catch (error) {
     console.error("File System Access API failed:", error);
-    // 如果 File System Access API 失敗，退回到下載方法
     downloadMarkdownFile(markdownContent);
   }
-  // console.log(markdownContent);
 }
 
-//使用File system Access API保存檔案
+// 使用 File System Access API 保存文件
 async function saveWithFileSystem(content) {
-  //瀏覽器是否支援
   if (!("showSaveFilePicker" in window)) {
     throw new Error("不支援此API");
   }
   try {
-    //顯示文件選擇器，用戶選擇保存位置與文件名
     const handle = await window.showSaveFilePicker({
       suggestedName: `${post.title.toLowerCase().replace(/\s+/g, "-")}.md`,
       types: [
@@ -238,22 +220,19 @@ async function saveWithFileSystem(content) {
         },
       ],
     });
-    // 創建可寫流
     const writable = await handle.createWritable();
-    // 寫入內容
     await writable.write(content);
-    // 關閉流
     await writable.close();
     console.log("File saved successfully");
-    errorMessage.value = ""; // 清除任何之前的錯誤消息
+    errorMessage.value = "";
   } catch (err) {
     console.error("Error saving file:", err);
     errorMessage.value = "Failed to save file. Please try again.";
-    throw err; // 重新拋出錯誤，以觸發下載備用方案
+    throw err;
   }
 }
 
-//清理暫存
+// 清理草稿
 function cleanDraft() {
   if (confirm("點擊後將刪除暫存文章")) {
     localStorage.removeItem("articleDraft");
@@ -268,29 +247,24 @@ function cleanDraft() {
   }
 }
 
-// 備用方法：生成可下載的 Markdown 文件
+// 下載 Markdown 文件（備用方法）
 function downloadMarkdownFile(content) {
-  // 創建一個 Blob 對象
   const blob = new Blob([content], { type: "text/markdown" });
-  // 創建一個臨時的 URL
   const url = URL.createObjectURL(blob);
-  // 創建一個臨時的 <a> 元素
   const link = document.createElement("a");
   link.href = url;
   link.download = `${post.title.toLowerCase().replace(/\s+/g, "-")}.md`;
-  // 模擬點擊下載
   document.body.appendChild(link);
   link.click();
-  // 清理
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
   console.log("File download initiated");
-  errorMessage.value = ""; // 清除任何之前的錯誤消息
+  errorMessage.value = "";
 }
 </script>
 
-
 <style scoped>
+/* 整體布局 */
 .blog-post-editor {
   max-width: 1200px;
   margin: 0 auto;
@@ -303,10 +277,47 @@ h2 {
   margin-bottom: 20px;
 }
 
+/* 表單布局 */
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
 
+/* 標題和日期 */
+.title-group {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 確保輸入框填滿容器 */
+.title-group input,
+.date-group input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 類別和評分 */
+.category-group {
+  flex: 3;
+}
+
+.rating-group {
+  flex: 1;
+}
+
+/* 標籤和其他表單元素 */
 label {
   display: block;
   margin-bottom: 5px;
@@ -317,14 +328,17 @@ label {
 input[type="text"],
 input[type="date"],
 input[type="number"],
+select,
 textarea {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
+/* 標籤樹結構 */
 .tag-tree {
   display: flex;
   flex-wrap: wrap;
@@ -383,6 +397,7 @@ textarea {
   color: #333;
 }
 
+/* 按鈕樣式 */
 .form-actions {
   margin-top: 20px;
   display: flex;
@@ -405,21 +420,34 @@ button:hover {
 }
 
 button[type="button"] {
-  background-color: #f44336;
+  background-color: #01cb30b8;
 }
 
 button[type="button"]:hover {
   background-color: #d32f2f;
 }
 
+/* 錯誤訊息 */
 .error-message {
   color: #f44336;
   margin-top: 10px;
   font-size: 14px;
 }
 
-/* 添加一些響應式設計 */
+/* 響應式設計 */
 @media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .title-group,
+  .date-group,
+  .category-group,
+  .rating-group {
+    flex: none;
+    width: 100%;
+  }
+
   .tag-tree {
     flex-direction: column;
   }

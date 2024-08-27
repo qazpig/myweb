@@ -21,15 +21,32 @@ export const useTagStore = defineStore('tag', {
       this.loading = true
       try {
         const response = await axios.get('/api/tags')
-        this.tags = response.data.data
-        console.log('Fetched tags:', this.tags); // 添加日誌
+        console.log('API response:', response); // 添加這行
+        if (response.data && Array.isArray(response.data.data)) {
+          this.tags = response.data.data
+          console.log('Fetched tags:', this.tags);
+        } else {
+          throw new Error('Invalid API response format');
+        }
         this.error = null
       } catch (error) {
-        console.error('Error fetching tags 錯誤錯誤:', error)
-        this.error = "failed to fetch tags"
+        console.error('Error fetching tags:', error)
+        this.error = error.message || "Failed to fetch tags"
+        this.tags = [] // 重置為空數組
       } finally {
         this.loading = false
       }
+      // try {
+      //   const response = await axios.get('/api/tags')
+      //   this.tags = response.data.data
+      //   console.log('Fetched tags:', this.tags); // 添加日誌
+      //   this.error = null
+      // } catch (error) {
+      //   console.error('Error fetching tags 錯誤錯誤:', error)
+      //   this.error = "failed to fetch tags"
+      // } finally {
+      //   this.loading = false
+      // }
     },
 
     //新增

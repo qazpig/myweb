@@ -6,6 +6,7 @@ import { articleCategories } from '@/data/articleCategories.js'
 import NewArticle from '@/views/NewArticle.vue'
 import CategoryView from '@/views/CategoryView.vue'
 import TagManager from '@/views/TagManager.vue'
+import TestVue from '@/views/TestVue.vue'
 // import ArticleArea from '@/components/ArticleArea.vue'
 // import BlogAdminView from '../views/BlogAdminView.vue'
 // import BoardGamesView from '@/views/BoardGamesView.vue'
@@ -95,7 +96,11 @@ const routes = [
     name: 'tagmanager',
     component: TagManager
   },
-
+  {
+    path: '/testvue',
+    name:'test',
+    component: TestVue
+  }
 ]
 
 const router = createRouter({

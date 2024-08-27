@@ -87,59 +87,62 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>教育主題 - 知識分享平台</h1>
+    <ul class="tag-list">
+        <li>
+          <label>
+            <input type="checkbox" name="tag" value="parent1">
+            父標籤 1
+          </label>
+          <ul>
+            <li>
+              <label>
+                <input type="checkbox" name="tag" value="child1">
+                子標籤 1
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" name="tag" value="child2">
+                子標籤 2
+              </label>
+            </li>
+          </ul>
+        </li>
+        <!-- 更多父標籤... -->
+      </ul>
+
+      <div class="tag-container">
+        <div class="tag-item parent">
+          <input type="checkbox" id="parent1" name="tag" value="parent1">
+          <label for="parent1">父標籤 1</label>
         </div>
-    </header>
-
-    <div class="container">
-        <main class="main-content">
-            <!-- 單篇文章或文章列表將在這裡渲染 -->
-            <div id="articleContent">
-                <div class="article-card">
-                    <h2>探索創新教學方法：翻轉課堂的實踐與成效</h2>
-                    <div class="article-meta">
-                        <span>作者：王小明</span> | 
-                        <span>發布日期：2024-08-15</span> | 
-                        <span>閱讀時間：10分鐘</span>
-                    </div>
-                    <p>翻轉課堂是近年來備受關注的教學模式，它顛覆了傳統的課堂結構，讓學生在家自主學習理論知識，而在課堂上則專注於問題討論和實踐應用...</p>
-                    <a href="#" class="read-more">閱讀全文</a>
-                </div>
-                <!-- 更多文章卡片 -->
+        <div class="tag-item child">
+          <input type="checkbox" id="child1" name="tag" value="child1">
+          <label for="child1">├─ 子標籤 1</label>
+        </div>
+        <div class="tag-item child">
+          <input type="checkbox" id="child2" name="tag" value="child2">
+          <label for="child2">└─ 子標籤 2</label>
+        </div>
+        <!-- 更多標籤... -->
+      </div>
+      <div class="tag-tree">
+        <div class="tag-item">
+          <span class="toggle">▶</span>
+          <input type="checkbox" id="parent1" name="tag" value="parent1">
+          <label for="parent1">父標籤 1</label>
+          <div class="children">
+            <div class="tag-item">
+              <input type="checkbox" id="child1" name="tag" value="child1">
+              <label for="child1">子標籤 1</label>
             </div>
-        </main>
-
-        <aside class="sidebar">
-            <div class="filter-section">
-                <div class="filter-title">教育階段</div>
-                <div class="filter-options">
-                    <span class="filter-option active">全部</span>
-                    <span class="filter-option">幼兒教育</span>
-                    <span class="filter-option">小學教育</span>
-                    <span class="filter-option">中學教育</span>
-                    <span class="filter-option">高等教育</span>
-                </div>
+            <div class="tag-item">
+              <input type="checkbox" id="child2" name="tag" value="child2">
+              <label for="child2">子標籤 2</label>
             </div>
-            <div class="filter-section">
-                <div class="filter-title">主題分類</div>
-                <div class="filter-options">
-                    <span class="filter-option active">全部</span>
-                    <span class="filter-option">教學方法</span>
-                    <span class="filter-option">教育科技</span>
-                    <span class="filter-option">課程設計</span>
-                    <span class="filter-option">學生輔導</span>
-                    <span class="filter-option">教育政策</span>
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <script>
-        // 這裡將來會放置Vue的邏輯
-        // 例如：根據路由決定渲染單篇文章或文章列表
-        // 以及處理過濾器的點擊事件等
-    </script>
+          </div>
+        </div>
+        <!-- 更多父標籤... -->
+      </div>
 </body>
 </html>
