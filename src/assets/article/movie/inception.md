@@ -1,7 +1,7 @@
 ---
 title: "Inception: A Mind-Bending Experience"
 date: "2023-05-15"
-category: "Movies"
+category: "movie"
 rating: 4.5
 ---
 

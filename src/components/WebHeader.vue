@@ -41,10 +41,10 @@ const navLinks = ref([
   { to: "/", text: "Home" },
   // { to: "/blog", text: "Blog" },
   { to: "/edu", text: "Edu" },
-  { to: "/movies", text: "Movies" },
+  { to: "/movie", text: "Movies" },
   { to: "/anime", text: "Anime" },
   { to: "/boardgame", text: "Board Games" },
-  { to: "/escapegames", text: "Escape Games" },
+  { to: "/escapegame", text: "Escape Games" },
 ]);
 </script>
 

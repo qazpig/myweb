@@ -1,11 +1,7 @@
 <template>
   <BaseView :category="props.category" :articleId="props.articleId">
     <template #article-list>
-      <div
-        v-for="game in articleStore.articles"
-        :key="game.id"
-        class="game-card"
-      >
+      <div v-for="game in boardGames" :key="game.id" class="game-card">
         <img :src="game.image" :alt="game.title" />
         <div class="game-info">
           <div class="game-title">{{ game.title }}</div>
@@ -92,6 +88,7 @@ const props = defineProps({
     default: null,
   },
 });
+console.log("props:", props);
 
 const articleStore = useArticleStore();
 console.log(articleStore);
@@ -102,19 +99,23 @@ const showArticle = computed(() => !!props.articleId);
 const gameTypes = ["策略", "家庭", "派對", "合作"];
 const difficultyLevels = ["入門", "中等", "專家"];
 
-// const articleId = computed(this.id)
-// console.log('articleId:'+articleId.value);
+const boardGames = computed(() => {
+  console.log("Category ID:", props.category.id);
+  return articleStore.getArticlesByCategory(props.category.id);
+});
+console.log("Boardgames:", boardGames);
 
 //
 onMounted(async () => {
+  // console.log("props:",props)
   if (showArticle.value) {
     await articleStore.fetchArticleById(props.articleId);
   } else {
-    await articleStore.fetchArticles(props.category.id);
+    // await articleStore.fetchArticles(props.category.id);
+    console.log("Component mounted, fetching articles...");
+    await articleStore.fetchArticles();
+    console.log("Articles after fetch:", articleStore.articles);
   }
-  // console.log("Component mounted, fetching articles...");
-  // await articleStore.fetchArticles();
-  // console.log("Articles after fetch:", articleStore.articles);
 });
 
 const getPreviewContent = (content) => {

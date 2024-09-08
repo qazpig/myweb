@@ -8,7 +8,7 @@ export const articleCategories = [
     }
   },
   {
-    id: 'movies', name: '電影', 
+    id: 'movie', name: '電影', 
     theme: {
       primaryColor: '#3498db',
       backgroundColor: '#ecf0f1',
@@ -24,7 +24,7 @@ export const articleCategories = [
     }
   },
   {
-    id: 'escapegames', name: '實境遊戲',
+    id: 'escapegame', name: '實境遊戲',
     theme: {
       primaryColor: '#f39c12',
       backgroundColor: '#fef5e7',
