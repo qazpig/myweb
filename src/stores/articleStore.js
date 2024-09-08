@@ -21,9 +21,13 @@ export const useArticleStore = defineStore('article', {
     getArticleById: (state) => (id) => state.articles.find(article => article.id === id) || null,
 
     getArticlesByCategory: (state) => (category) => {
-      return state.articles.filter(article =>
+      console.log("Filtering articles for category:", category);
+      console.log("All articles:", state.articles);
+      const filteredArticles = state.articles.filter(article =>
         article.category === category || article.mainCategory === category
       );
+      console.log("Filtered articles:", filteredArticles);
+      return filteredArticles
     },
 
     getArticlesByTag: (state) => (tag) => {
@@ -81,12 +85,12 @@ export const useArticleStore = defineStore('article', {
 
     //可以透過ID加載單篇文章
     async fetchArticleById(id) {
-      console.log('進來fetcharticlebyid ID:'+id)
+      console.log('進來fetcharticlebyid ID:' + id)
       const existingArticle = this.getArticleById(id);
       if (existingArticle) {
         return existingArticle;
       }
-    
+
       this.loading = true
       this.error = null
       try {

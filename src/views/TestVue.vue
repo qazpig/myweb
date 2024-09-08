@@ -24,6 +24,7 @@
             <option value="movie">Movie</option>
             <option value="anime">Anime</option>
             <option value="escapegame">Escape Game</option>
+            <option value="education">Education</option>
           </select>
         </div>
         <div class="form-group rating-group">
@@ -69,8 +70,11 @@
         <button type="submit">Create Markdown File</button>
         <button @click.prevent="cleanDraft" type="button">清除草稿</button>
       </div>
-    </form>
 
+    </form>
+      <div>
+        <button @click="testbutton">測試按鈕</button>
+      </div>
     <!-- 錯誤訊息顯示 -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
@@ -102,7 +106,8 @@ const getCategoryName = (category) => {
     boardgame: '桌遊',
     movie: '電影',
     anime: '動畫',
-    escapegame: '密室逃脫'
+    escapegame: '密室逃脫',
+    education: '教育'
   };
   return categoryNames[category] || category;
 };
@@ -231,7 +236,9 @@ async function saveWithFileSystem(content) {
     throw err;
   }
 }
-
+function testbutton(){
+  console.log(post)
+}
 // 清理草稿
 function cleanDraft() {
   if (confirm("點擊後將刪除暫存文章")) {
