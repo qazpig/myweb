@@ -1,7 +1,7 @@
 const n=`---\r
 title: "測試標題噗噗"\r
 date: "2023-05-15"\r
-category: "Movies"\r
+category: "movie"\r
 rating: 5\r
 ---\r
 \r

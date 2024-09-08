@@ -1,7 +1,7 @@
 const r=`---\r
 title: "卡坦島：策略與運氣的完美平衡"\r
 date: "2024-08-20"\r
-category: "BoardGames"\r
+category: "boardgame"\r
 rating: 4.5\r
 tags: ["策略", "家庭", "經典"]\r
 players: "3-4"\r

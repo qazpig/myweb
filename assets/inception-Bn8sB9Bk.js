@@ -1,7 +1,7 @@
 const e=`---\r
 title: "Inception: A Mind-Bending Experience"\r
 date: "2023-05-15"\r
-category: "Movies"\r
+category: "movie"\r
 rating: 4.5\r
 ---\r
 \r

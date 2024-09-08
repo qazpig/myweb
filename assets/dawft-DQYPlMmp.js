@@ -1,7 +1,7 @@
 const r=`---\r
 title: "矮人礦坑：緊張刺激的寶石爭奪戰"\r
 date: "2024-09-05"\r
-category: "BoardGames"\r
+category: "boardgame"\r
 rating: 4.2\r
 tags: ["派對", "家庭", "輕策略"]\r
 players: "2-7"\r
