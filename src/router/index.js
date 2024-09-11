@@ -7,6 +7,7 @@ import NewArticle from '@/views/NewArticle.vue'
 import CategoryView from '@/views/CategoryView.vue'
 import TagManager from '@/views/TagManager.vue'
 import TestVue from '@/views/TestVue.vue'
+import TempTestView from '@/views/TempTestView.vue'
 // import ArticleArea from '@/components/ArticleArea.vue'
 // import BlogAdminView from '../views/BlogAdminView.vue'
 // import BoardGamesView from '@/views/BoardGamesView.vue'
@@ -69,24 +70,6 @@ const routes = [
     component: NewArticle
   },
   {
-    path: '/movies',
-    name: 'movies',
-    component: BlogView
-    // component: () => import('../views/MoviesView.vue')
-  },
-  {
-    path: '/anime',
-    name: 'anime',
-    component: BlogView
-    // component: () => import('../views/AnimeView.vue')
-  },
-  {
-    path: '/escapegames',
-    name: 'escapegames',
-    component: BlogView
-    // component: () => import('../views/EscapeGamesView.vue')
-  },
-  {
     path: '/manage',
     name: 'manage',
     component: TagAndFrontMatterManager
@@ -98,9 +81,16 @@ const routes = [
   },
   {
     path: '/testvue',
-    name:'test',
+    name:'testvue',
     component: TestVue
   }
+  ,
+  {
+    path: '/temptest',
+    name:'temptest',
+    component: TempTestView
+  }
+
 ]
 
 const router = createRouter({

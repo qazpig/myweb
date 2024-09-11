@@ -2,7 +2,7 @@
   <BaseView :category="props.category" :articleId="props.articleId">
     <template #article-list>
       <div v-for="game in boardGames" :key="game.id" class="game-card">
-        <img :src="game.image" :alt="game.title" />
+        <!-- <img :src="game.image" :alt="game.title" /> -->
         <div class="game-info">
           <div class="game-title">{{ game.title }}</div>
           <div class="game-meta">

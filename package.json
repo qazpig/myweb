@@ -11,6 +11,7 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "gray-matter": "^4.0.3",
+    "gsap": "^3.12.5",
     "markdown-it": "^14.1.0",
     "markdown-it-katex": "^2.0.3",
     "md-editor-v3": "^4.18.1",
