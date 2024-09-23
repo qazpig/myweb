@@ -1,6 +1,15 @@
 <template>
   <div class="blog-post-editor">
+    <h2>{{ fileLoaded ? "編輯文章" : "創建新文章" }}</h2>
     <h2>Create New Blog Post</h2>
+    <!-- 文件上傳輸入 -->
+    <div class="file-upload">
+      <input type="file" accept=".md" @change="handleFileUpload" />
+      <p v-if="fileLoaded" class="file-loaded-message">
+        文件已加載: {{ loadedFileName }}
+      </p>
+    </div>
+
     <form @submit.prevent="createMarkdownFile">
       <!-- 標題和日期區塊 -->
       <div class="form-row">
@@ -44,15 +53,29 @@
       <div class="form-group">
         <label>標籤：</label>
         <div class="tag-tree">
-          <div v-for="category in tagCategories" :key="category" class="tag-category">
+          <div
+            v-for="category in tagCategories"
+            :key="category"
+            class="tag-category"
+          >
             <h3>{{ getCategoryName(category) }}</h3>
-            <div v-for="tag in getCategoryTags(category)" :key="tag.id" class="tag-item" :style="{ marginLeft: `${getTagLevel(tag) * 20}px` }">
+            <div
+              v-for="tag in getCategoryTags(category)"
+              :key="tag.id"
+              class="tag-item"
+              :style="{ marginLeft: `${getTagLevel(tag) * 20}px` }"
+            >
               <label :class="{ 'parent-tag': !tag.parentId }">
-                <input type="checkbox" :value="tag.id" v-model="selectedTags">
+                <input type="checkbox" :value="tag.id" v-model="selectedTags" />
                 {{ tag.name }}
               </label>
-              <button v-if="hasChildren(tag)" @click.prevent="toggleChildren(tag)" class="toggle-btn" type="button">
-                {{ isExpanded(tag) ? '−' : '+' }}
+              <button
+                v-if="hasChildren(tag)"
+                @click.prevent="toggleChildren(tag)"
+                class="toggle-btn"
+                type="button"
+              >
+                {{ isExpanded(tag) ? "−" : "+" }}
               </button>
             </div>
           </div>
@@ -70,15 +93,16 @@
         <button type="submit">Create Markdown File</button>
         <button @click.prevent="cleanDraft" type="button">清除草稿</button>
       </div>
-
     </form>
-      <div>
-        <button @click="testbutton">測試按鈕</button>
-      </div>
+    <div>
+      <button @click="testbutton">測試按鈕</button>
+    </div>
     <!-- 錯誤訊息顯示 -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
+
+
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
@@ -86,6 +110,7 @@ import { MdEditor } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import { useTagStore } from "@/stores/tagStore";
 import { storeToRefs } from "pinia";
+import { loadMdFile } from "@/js/mdFileReader";
 
 // 初始化 tag store
 const tagStore = useTagStore();
@@ -93,28 +118,29 @@ const { tags } = storeToRefs(tagStore);
 
 // 用於管理文章標籤的響應式引用
 const selectedTags = ref([]);
-
 // 用於管理展開的標籤
 const expandedTags = ref(new Set());
 
 // 計算屬性：獲取所有標籤類別
-const tagCategories = computed(() => [...new Set(tags.value.map(tag => tag.category))]);
+const tagCategories = computed(() => [
+  ...new Set(tags.value.map((tag) => tag.category)),
+]);
 
 // 獲取類別名稱的中文翻譯
 const getCategoryName = (category) => {
   const categoryNames = {
-    boardgame: '桌遊',
-    movie: '電影',
-    anime: '動畫',
-    escapegame: '密室逃脫',
-    education: '教育'
+    boardgame: "桌遊",
+    movie: "電影",
+    anime: "動畫",
+    escapegame: "密室逃脫",
+    education: "教育",
   };
   return categoryNames[category] || category;
 };
 
 // 獲取特定類別的標籤
 const getCategoryTags = (category) => {
-  return tags.value.filter(tag => tag.category === category);
+  return tags.value.filter((tag) => tag.category === category);
 };
 
 // 獲取標籤的層級
@@ -123,14 +149,14 @@ const getTagLevel = (tag) => {
   let currentTag = tag;
   while (currentTag.parentId) {
     level++;
-    currentTag = tags.value.find(t => t.id === currentTag.parentId);
+    currentTag = tags.value.find((t) => t.id === currentTag.parentId);
   }
   return level;
 };
 
 // 檢查標籤是否有子標籤
 const hasChildren = (tag) => {
-  return tags.value.some(t => t.parentId === tag.id);
+  return tags.value.some((t) => t.parentId === tag.id);
 };
 
 // 檢查標籤是否已展開
@@ -162,16 +188,53 @@ const post = reactive({
 // 錯誤訊息
 const errorMessage = ref("");
 
+
+// 文件加載狀態
+const fileLoaded = ref(false);
+const loadedFileName = ref('');
+/**
+ * 處理文件上傳
+ * @param {Event} event - 文件上傳事件
+ */
+ const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  // console.log("file = ",file);
+  // console.log("event = ",event);
+  
+  if (file) {
+    try {
+      const loadedData = await loadMdFile(file);
+      
+      console.log("loadedData = ",loadedData);
+      // console.log("loadedData = ",loadedData.category);
+      // 更新表單數據
+      post.title = loadedData.title;
+      post.date = loadedData.date;
+      post.category = loadedData.category;
+      post.rating = loadedData.rating;
+      editorText.value = loadedData.content;
+      fileLoaded.value = true;
+      loadedFileName.value = file.name;
+    } catch (error) {
+      console.error('加載文件失敗:', error);
+      alert('加載文件失敗，請檢查文件格式是否正確。');
+    }
+  }
+};
+
+
 // 組件掛載時的操作
 onMounted(async () => {
   // 從 localStorage 讀取草稿
   const savedDraft = localStorage.getItem("articleDraft");
+  // console.log("savedDraft",savedDraft);
   if (savedDraft) {
     const parsedDraft = JSON.parse(savedDraft);
     Object.assign(post, parsedDraft);
     editorText.value = parsedDraft.content || "";
     selectedTags.value = parsedDraft.tags || [];
   }
+  
   // 獲取標籤數據
   await tagStore.fetchTags();
 });
@@ -196,7 +259,9 @@ async function createMarkdownFile() {
 title: "${post.title}"
 date: "${post.date}"
 category: "${post.category}"
-tags: [${selectedTags.value.map((id) => `"${tagStore.getTagById(id).name}"`).join(", ")}]
+tags: [${selectedTags.value
+    .map((id) => `"${tagStore.getTagById(id).name}"`)
+    .join(", ")}]
 rating: ${post.rating}
 ---
 `;
@@ -236,9 +301,8 @@ async function saveWithFileSystem(content) {
     throw err;
   }
 }
-function testbutton(){
-  console.log(post)
-}
+
+
 // 清理草稿
 function cleanDraft() {
   if (confirm("點擊後將刪除暫存文章")) {
@@ -254,6 +318,7 @@ function cleanDraft() {
   }
 }
 
+
 // 下載 Markdown 文件（備用方法）
 function downloadMarkdownFile(content) {
   const blob = new Blob([content], { type: "text/markdown" });
@@ -268,6 +333,13 @@ function downloadMarkdownFile(content) {
   console.log("File download initiated");
   errorMessage.value = "";
 }
+
+
+// 自己的測試按鈕
+function testbutton() {
+  console.log(post);
+}
+
 </script>
 
 <style scoped>

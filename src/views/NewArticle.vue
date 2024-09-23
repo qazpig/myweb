@@ -1,431 +1,182 @@
 <template>
   <div class="blog-post-editor">
-    <h2>Create New Blog Post</h2>
-    <form @submit.prevent="createMarkdownFile">
+    <h2>{{ fileLoaded ? '編輯文章' : '創建新文章' }}</h2>
+    
+    <!-- 文件上傳輸入 -->
+    <div class="file-upload">
+      <input type="file" accept=".md" @change="handleFileUpload" />
+      <p v-if="fileLoaded" class="file-loaded-message">文件已加載: {{ loadedFileName }}</p>
+    </div>
+    
+    <form @submit.prevent="saveArticle">
+      <!-- 文章標題 -->
       <div class="form-group">
-        <label for="title">Title:</label>
+        <label for="title">標題:</label>
         <input v-model="post.title" id="title" required />
       </div>
+      
+      <!-- 發布日期 -->
       <div class="form-group">
-        <label for="date">Date:</label>
+        <label for="date">日期:</label>
         <input v-model="post.date" id="date" type="date" required />
       </div>
+      
+      <!-- 文章分類 -->
       <div class="form-group">
-        <label for="category">Category:</label>
+        <label for="category">分類:</label>
         <input v-model="post.category" id="category" required />
       </div>
+      
+      <!-- 評分 -->
       <div class="form-group">
-      <label>標籤：</label>
-      <div class="tag-tree">
-        <div v-for="category in tagCategories" :key="category" class="tag-category">
-          <h3>{{ getCategoryName(category) }}</h3>
-          <div v-for="tag in getCategoryTags(category)" :key="tag.id" class="tag-item" :style="{ marginLeft: `${getTagLevel(tag) * 20}px` }">
-            <label :class="{ 'parent-tag': !tag.parentId }">
-              <input type="checkbox" :value="tag.id" v-model="selectedTags">
-              {{ tag.name }}
-            </label>
-            <button v-if="hasChildren(tag)" @click="toggleChildren(tag)" class="toggle-btn">
-              {{ isExpanded(tag) ? '−' : '+' }}
-            </button>
-          </div>
-        </div>
+        <label for="rating">評分:</label>
+        <input v-model="post.rating" id="rating" type="number" step="0.1" min="0" max="5" />
       </div>
-    </div>
+      
+      <!-- Markdown 編輯器 -->
       <div class="form-group">
-        <label for="rating">Rating:</label>
-        <input
-          v-model="post.rating"
-          id="rating"
-          type="number"
-          step="0.1"
-          min="0"
-          max="5"
-        />
+        <label for="content">內容:</label>
+        <MdEditor v-model="editorText" />
       </div>
-
-      <div class="form-group">
-        <label for="content">Content:</label>
-        <MdEditor v-model="editorText"></MdEditor>
-      </div>
-      <button type="submit">Create Markdown File</button>
-      <button @click="cleanDraft">清除草稿</button>
+      
+      <!-- 提交按鈕 -->
+      <button type="submit">保存文章</button>
     </form>
-    <!-- 添加錯誤消息顯示 -->
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
-import { MdEditor } from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
-import { useTagStore } from "@/stores/tagStore";
-const tagStore = useTagStore();
+import { ref, reactive, watch } from 'vue';
+import { MdEditor } from 'md-editor-v3';
+import { loadMdFile } from '@/js/mdFileReader';
+import 'md-editor-v3/lib/style.css';
 
-import { storeToRefs } from "pinia";
-const { tags } = storeToRefs(tagStore);
-
-console.log("這是tagStore的資料:", tagStore);
-console.log("這是tag的資料:", tags.value);
-
-//管理文章標籤的響應式引用
-const selectedTags = ref([]);
-
-const expandedTags = ref(new Set());
-
-const tagCategories = computed(() => [...new Set(tags.value.map(tag => tag.category))]);
-
-const getCategoryName = (category) => {
-  // 將類別名稱映射為中文
-  const categoryNames = {
-    boardgame: '桌遊',
-    movie: '電影',
-    anime: '動畫',
-    escapegame: '密室逃脫'
-  };
-  return categoryNames[category] || category;
-};
-
-const getCategoryTags = (category) => {
-  return tags.value.filter(tag => tag.category === category);
-};
-
-const getTagLevel = (tag) => {
-  let level = 0;
-  let currentTag = tag;
-  while (currentTag.parentId) {
-    level++;
-    currentTag = tags.value.find(t => t.id === currentTag.parentId);
-  }
-  return level;
-};
-
-const hasChildren = (tag) => {
-  return tags.value.some(t => t.parentId === tag.id);
-};
-
-const isExpanded = (tag) => {
-  return expandedTags.value.has(tag.id);
-};
-
-const toggleChildren = (tag) => {
-  if (expandedTags.value.has(tag.id)) {
-    expandedTags.value.delete(tag.id);
-  } else {
-    expandedTags.value.add(tag.id);
-  }
-};
-
-//計算屬性：標籤層級關係
-// const hierarchicalTags = computed(() => {
-//   const tagMap = new Map(
-//     tags.value.map((tag) => [tag.id, { ...tag, level: 0, children: [] }])
-//   );
-//   const rootTags = [];
-
-//   for (const tag of tagMap.values()) {
-//     if (tag.parentId) {
-//       const parent = tagMap.get(tag.parentId);
-//       if (parent) {
-//         parent.children.push(tag);
-//         tag.level = parent.level + 1;
-//       } else {
-//         rootTags.push(tag);
-//       }
-//     } else {
-//       rootTags.push(tag);
-//     }
-//   }
-
-//   function flattenTags(tags, result = []) {
-//     for (const tag of tags) {
-//       result.push(tag);
-//       if (tag.children.length > 0) {
-//         flattenTags(tag.children, result);
-//       }
-//     }
-//     return result;
-//   }
-
-//   return flattenTags(rootTags);
-// });
-
-//編輯中的文字
-const editorText = ref("# Hello");
-
-//reactive 管理表單數據
+// 文章數據
 const post = reactive({
-  title: "",
-  date: "",
-  category: "",
-  rating: "",
-  content: "",
+  title: '',
+  date: '',
+  category: '',
+  rating: '',
 });
 
-// 使用 ref 來管理錯誤消息
-const errorMessage = ref("");
+// Markdown 編輯器內容
+const editorText = ref('');
 
-// 新增：從 localStorage 讀取草稿
-onMounted(async () => {
-  const savedDraft = localStorage.getItem("articleDraft");
-  if (savedDraft) {
-    const parsedDraft = JSON.parse(savedDraft);
-    Object.assign(post, parsedDraft);
-    editorText.value = parsedDraft.content || "";
-    selectedTags.value = parsedDraft.tags || [];
+// 文件加載狀態
+const fileLoaded = ref(false);
+const loadedFileName = ref('');
+
+/**
+ * 處理文件上傳
+ * @param {Event} event - 文件上傳事件
+ */
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    try {
+      const loadedData = await loadMdFile(file);
+      // 更新表單數據
+      post.title = loadedData.title;
+      post.date = loadedData.date;
+      post.category = loadedData.category;
+      post.rating = loadedData.rating;
+      editorText.value = loadedData.content;
+      fileLoaded.value = true;
+      loadedFileName.value = file.name;
+    } catch (error) {
+      console.error('加載文件失敗:', error);
+      alert('加載文件失敗，請檢查文件格式是否正確。');
+    }
   }
-  await tagStore.fetchTags();
-});
+};
 
-// 新增：監聽變化並保存到 localStorage
-watch(
-  [post, editorText],
-  () => {
-    // console.log('更新更新')
-    const draftToSave = {
-      ...post,
-      tags: selectedTags.value,
-      content: editorText.value,
-    };
-    console.log(selectedTags.value);
-    localStorage.setItem("articleDraft", JSON.stringify(draftToSave));
-  },
-  { deep: true }
-);
-
-// 創建 Markdown 文件的主函數
-async function createMarkdownFile() {
+/**
+ * 保存文章
+ */
+const saveArticle = () => {
+  // 組合 frontmatter 和文章內容
   const frontMatter = `---
 title: "${post.title}"
 date: "${post.date}"
 category: "${post.category}"
-tags:[${selectedTags.value
-    .map((id) => `"${tagStore.getTagById(id).name}"`)
-    .join(", ")}]
 rating: ${post.rating}
----
-`;
-  //組合起完整的MD內容
-  const markdownContent = frontMatter + editorText.value;
-
-  // console.log(editorText);
-  // console.log(markdownContent);
-  try {
-    //使用File Sstem Access API
-    await saveWithFileSystem(markdownContent);
-  } catch (error) {
-    console.error("File System Access API failed:", error);
-    // 如果 File System Access API 失敗，退回到下載方法
-    downloadMarkdownFile(markdownContent);
-  }
-  // console.log(markdownContent);
-}
-
-//使用File system Access API保存檔案
-async function saveWithFileSystem(content) {
-  //瀏覽器是否支援
-  if (!("showSaveFilePicker" in window)) {
-    throw new Error("不支援此API");
-  }
-  try {
-    //顯示文件選擇器，用戶選擇保存位置與文件名
-    const handle = await window.showSaveFilePicker({
-      suggestedName: `${post.title.toLowerCase().replace(/\s+/g, "-")}.md`,
-      types: [
-        {
-          description: "Markdown Files",
-          accept: { "text/markdown": [".md"] },
-        },
-      ],
-    });
-    // 創建可寫流
-    const writable = await handle.createWritable();
-    // 寫入內容
-    await writable.write(content);
-    // 關閉流
-    await writable.close();
-    console.log("File saved successfully");
-    errorMessage.value = ""; // 清除任何之前的錯誤消息
-  } catch (err) {
-    console.error("Error saving file:", err);
-    errorMessage.value = "Failed to save file. Please try again.";
-    throw err; // 重新拋出錯誤，以觸發下載備用方案
-  }
-}
-
-//清理暫存
-function cleanDraft() {
-  if (confirm("點擊後將刪除暫存文章")) {
-    localStorage.removeItem("articleDraft");
-    Object.assign(post, {
-      title: "",
-      date: "",
-      category: "",
-      rating: "",
-    });
-    editorText.value = "";
-    selectedTags.value = [];
-  }
-}
-
-// 備用方法：生成可下載的 Markdown 文件
-function downloadMarkdownFile(content) {
-  // 創建一個 Blob 對象
-  const blob = new Blob([content], { type: "text/markdown" });
-  // 創建一個臨時的 URL
+---`;
+  const fullContent = `${frontMatter}\n\n${editorText.value}`;
+  
+  // 創建 Blob 對象
+  const blob = new Blob([fullContent], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
-  // 創建一個臨時的 <a> 元素
-  const link = document.createElement("a");
+  
+  // 創建下載鏈接
+  const link = document.createElement('a');
   link.href = url;
-  link.download = `${post.title.toLowerCase().replace(/\s+/g, "-")}.md`;
-  // 模擬點擊下載
+  link.download = `${post.title.toLowerCase().replace(/\s+/g, '-')}.md`;
+  
+  // 觸發下載
   document.body.appendChild(link);
   link.click();
-  // 清理
   document.body.removeChild(link);
+  
+  // 清理 URL 對象
   URL.revokeObjectURL(url);
-  console.log("File download initiated");
-  errorMessage.value = ""; // 清除任何之前的錯誤消息
+};
+
+// 監聽 editorText 變化，自動保存到 localStorage
+watch(editorText, (newContent) => {
+  localStorage.setItem('draftContent', newContent);
+});
+
+// 組件加載時，嘗試從 localStorage 恢復草稿
+const savedDraft = localStorage.getItem('draftContent');
+if (savedDraft) {
+  editorText.value = savedDraft;
 }
 </script>
 
-
 <style scoped>
 .blog-post-editor {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  font-family: Arial, sans-serif;
 }
 
-h2 {
-  color: #333;
+.file-upload {
   margin-bottom: 20px;
+}
+
+.file-loaded-message {
+  color: green;
+  margin-top: 5px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 label {
   display: block;
   margin-bottom: 5px;
-  font-weight: bold;
-  color: #555;
 }
 
 input[type="text"],
 input[type="date"],
-input[type="number"],
-textarea {
+input[type="number"] {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
-}
-
-.tag-tree {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 10px;
-}
-
-.tag-category {
-  flex: 1;
-  min-width: 200px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-}
-
-.tag-category h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 16px;
-}
-
-.tag-item {
-  margin: 5px 0;
-  display: flex;
-  align-items: center;
-}
-
-.tag-item label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.tag-item input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-.parent-tag {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-.toggle-btn {
-  margin-left: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: #666;
-  padding: 0 5px;
-}
-
-.toggle-btn:hover {
-  color: #333;
-}
-
-.form-actions {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
 }
 
 button {
-  background-color: #4caf50;
+  background-color: #4CAF50;
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
 }
 
 button:hover {
   background-color: #45a049;
-}
-
-button[type="button"] {
-  background-color: #f44336;
-}
-
-button[type="button"]:hover {
-  background-color: #d32f2f;
-}
-
-.error-message {
-  color: #f44336;
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-/* 添加一些響應式設計 */
-@media (max-width: 768px) {
-  .tag-tree {
-    flex-direction: column;
-  }
-
-  .tag-category {
-    min-width: 100%;
-  }
 }
 </style>
